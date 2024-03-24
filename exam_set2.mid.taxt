@@ -76,3 +76,23 @@ on carmechanic.m_owns.owner_id = carmechanic.m_owner.o_id
 where extract(year from date_of_buy) = 2006
 order by 1;
 
+9. List all data of car evaluations where price is at least 1.5 million less 
+than the average.
+
+select * 
+from carmechanic.m_car_evaluation
+where price - (select avg(price)
+from carmechanic.m_car_evaluation) <= 1500000;
+
+10. List the name of latest owner of the car with an identifier 172.
+
+
+select o_name 
+from carmechanic.m_owns
+join carmechanic.m_owner
+on carmechanic.m_owns.owner_id = carmechanic.m_owner.o_id
+where car_id = 172
+and date_of_buy = 
+(select max(date_of_buy)
+from carmechanic.m_owns
+where car_id = 172);
