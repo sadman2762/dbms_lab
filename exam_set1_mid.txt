@@ -1,0 +1,6 @@
+1.list the name , address , phone number of all mechanics, sorted 
+ascending by their ages ,i.e. starting with the youngest.
+
+select m_name,address,phone
+from carmechanic.m_mechanic
+order by months_between(sysdate,birth_date)/12
