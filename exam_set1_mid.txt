@@ -4,3 +4,99 @@ ascending by their ages ,i.e. starting with the youngest.
 select m_name,address,phone
 from carmechanic.m_mechanic
 order by months_between(sysdate,birth_date)/12
+
+2. List all car owners with a name longer than 10 chracters and an
+unknown address sorted by their names.
+
+select O_name
+from carmechanic.m_owner
+where length(o_name)>10
+and address is not null
+order by o_name
+
+3. List the identifiers of cars(together with repair time in days) that were 
+repaired for more than 30 days. Sort the result by their repair time.(i.e 
+the longest repair should appear first)
+
+select car_id,end_date-start_date
+from carmechanic.m_repair
+where end_date-start_date > 30
+order by 2 desc
+
+4. How many cars of each color in our database? Sort the result descending 
+by the number of cars.
+
+select color, count(c_id)
+from carmechanic.m_car
+where color is not null
+group by color
+order by 2 desc
+
+5. Which cars were repaired more than 4 times? the car should be represented 
+in the by thier identifiers, sorted.
+
+select car_id
+from carmechanic.m_repair
+having count(car_id) > 4
+group by car_id
+order by 1
+
+6. What is the average cost of repairing of green cars?
+
+select color, avg(repair_cost)
+from carmechanic.m_car
+join carmechanic.m_repair
+on carmechanic.m_car.c_id =carmechanic.m_repair.car_id
+where color = 'green'
+group by color
+
+
+7. For each workshop list at least one mechanic from debrecen ever
+ worked, determine the average salary of the mechanics from debrecen.
+The address of mechanics who live in debrecen starts with 'Debrecen'.
+ Sort the result descending by the average salary.
+
+ select  carmechanic.m_workshop.w_id, avg(carmechanic.m_works_for.salary)
+from carmechanic.m_workshop
+join carmechanic.m_works_for
+on   carmechanic.m_workshop.w_id = carmechanic.m_works_for.workshop_id
+join carmechanic.m_mechanic
+on carmechanic.m_works_for.mechanic_id =carmechanic.m_mechanic.m_id
+where carmechanic.m_mechanic.address like 'Debrecen%'
+group by carmechanic.m_workshop.w_id
+order by 2 desc
+
+
+ 8. For each car purchased in 2006, list the name of its owner and 
+ license plate number of the car. Sort the result in alphabetical 
+ order of their names.
+
+ select o_name,license_plate_number
+from carmechanic.m_car
+join carmechanic.m_owns
+on carmechanic.m_car.c_id = carmechanic.m_owns.car_id
+join carmechanic.m_owner
+on carmechanic.m_owns.owner_id = carmechanic.m_owner.o_id
+where extract(year from date_of_buy) = 2006
+order by 1
+
+9. List the license plate numbers of cars whose first sell price is
+is less than average first sell price of blue cars .
+
+select license_plate_number 
+from carmechanic.m_car
+where first_sell_price <
+(select avg(first_sell_price)
+from carmechanic.m_car
+where color = 'blue'
+group by color)
+
+10. List all data of green cars having lowest first sell price.
+
+select *
+from carmechanic.m_car
+where color = 'green'
+and first_sell_price = 
+(select min(first_sell_price)
+from carmechanic.m_car
+where color = 'green')
