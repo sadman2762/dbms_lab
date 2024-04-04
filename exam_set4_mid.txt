@@ -1,0 +1,93 @@
+1.list all data of car evalutions where price is less than 500 000.Sort the result 
+ascending by the evalution dates.
+
+select * 
+from carmechanic.m_car_evaluation
+where price < 500000
+order by evaluation_date asc;
+
+2.List in alphabetical order car brand names consisting of multiple words i.e. those 
+containing at least one space or hyphen.
+
+select *
+from carmechanic.m_car_make
+where brand like '% %'
+or brand like '%-%'
+order by brand;
+
+3.List start date of employments(together with associated salary) that are at least 
+5 years old and have not ended yet(i.e. the end date is unknown)
+
+select start_of_employment,salary
+from carmechanic.m_works_for
+where months_between(sysdate ,start_of_employment)/12 >= 5
+and end_of_employment is null;
+
+4. What is total repair cost of each cars?The cars should be represented in the 
+result by their identifiers.
+
+select car_id, sum(repair_cost) 
+from carmechanic.m_repair
+group by car_id
+order by 2;
+
+
+5.What is the total repair cost of the car with a license plate number 'ABC201'?
+
+select  sum(repair_cost)
+from carmechanic.m_repair r
+join carmechanic.m_car c
+on c.c_id=r.car_id
+where license_plate_number like 'ABC201'
+group by car_id;
+
+6.List the average repair cost of each model where the average repair cost exceeds 
+100 000 .the models should be represented in the result by their identifiers.
+
+select model_id,avg(repair_cost)
+from carmechanic.m_car c
+join carmechanic.m_repair r
+on   c.c_id = r.car_id
+having avg(repair_cost)>100000
+group by model_id;
+
+7.Which mechanics highest salary was no more than 200000? The mechanics should be
+represented in the result by their identifiers.
+
+select mechanic_id,max(salary)
+from carmechanic.m_works_for
+having max(salary)<200000
+group by mechanic_id;
+
+8.Which cars were repaired in the shop 'Kobela Bt'? The cars should be represented 
+in the result by their license plate number , each only once,sorted alphabetically.
+
+select distinct license_plate_number
+from carmechanic.m_car c
+join carmechanic.m_repair r
+on c.c_id = r.car_id
+join carmechanic.m_workshop w
+on r.workshop_id = w.w_id
+where w_name like 'Kobela Bt.'
+order by license_plate_number;
+
+9.List license plate number of cars whose first sell price is greater than average first
+sell price of blue cars.
+
+select license_plate_number
+from carmechanic.m_car
+where first_sell_price >
+(select avg(first_sell_price)
+from carmechanic.m_car
+where color = 'blue');
+
+10. List license plate number and color of cars that were evaluated during earliest 
+car evaluation.
+
+select license_plate_number,color
+from carmechanic.m_car c
+join carmechanic.m_car_evaluation e
+on c.c_id=e.car_id
+where e.evaluation_date =
+(select min(evaluation_date)
+from carmechanic.m_car_evaluation);
