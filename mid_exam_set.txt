@@ -283,6 +283,16 @@ and address like 'Debrecen%'
 group by workshop_id
 order by 2 desc;
 
+71.How much did the first owner of each car pay for the car? List the name of the 
+(first) owners ,license plate number of cars and the price.Sort the result ascending
+by the name then descending by the price.
+
+select o_name,license_plate_number,first_sell_price
+from carmechanic.m_car
+join carmechanic.m_owns on c_id = car_id
+join carmechanic.m_owner on o_id = owner_id
+order by 1 asc, 3 desc;
+
 74.List the name of workshops where at least one mechanic from Eger has ever worked.
 Mechanic from Eger have an address starting with 'Eger'.Each workshop should appear 
 only once.
@@ -293,6 +303,16 @@ join carmechanic.m_works_for on w_id = workshop_id
 join carmechanic.m_mechanic m on m_id = mechanic_id
 where m.address like 'Eger%'
 group by w_id,w_name;
+
+75.List the license plate number of cars 'Balogh Emese' has ever bought as well as
+the date of each purchase.Sort the result by the date of purchase.
+
+select license_plate_number,date_of_buy
+from carmechanic.m_car
+join carmechanic.m_owns on car_id = c_id
+join carmechanic.m_owner on o_id = owner_id
+where o_name = 'Balogh Emese'
+order by 2;
 
 
 
@@ -318,6 +338,15 @@ join carmechanic.m_workshop on w_id = workshop_id
 where license_plate_number = 'AIT601'
 group by w_id,w_name;
 
+79.List the license plate number of cars 'Veres Keve' has ever owned.Each car should
+appear only once in the result.
+
+select distinct license_plate_number
+from carmechanic.m_car
+join carmechanic.m_owns on car_id = c_id
+join carmechanic.m_owner on o_id = owner_id
+where o_name = 'Veres Keve';
+
 80.For each car purchased in 2006,list the name of its new owners and license plate 
 number of the car.Sort the result alphabetical orders of their names.
 
@@ -327,6 +356,15 @@ join carmechanic.m_owns on c_id = car_id
 join carmechanic.m_owner on o_id = owner_id
 where extract(year from date_of_buy) = 2006
 order by 1;
+
+85.List license plate number of cars whose first sell price whose first sell 
+price is greater than average first sell price of blue cars.
+
+select license_plate_number
+from carmechanic.m_car
+where first_sell_price > (select avg(first_sell_price)
+from carmechanic.m_car
+where color = 'blue');
 
 
 
