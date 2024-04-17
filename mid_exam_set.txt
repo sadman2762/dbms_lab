@@ -141,4 +141,122 @@ from carmechanic.m_car_model
 where details not like '%5-door%'
 and substr(cm_name,1,1) = substr(make,1,1);
 
+51.Which cars were evaluated in 2011?The cars should be represented in the result by 
+their license plate number ,each car only once.
+
+select distinct license_plate_number
+from carmechanic.m_car
+join carmechanic.m_car_evaluation on c_id = car_id
+where extract(year from evaluation_date) = 2011;
+
+52.List all car evaluation with the following data: license plate number,evaluation date
+price . Sort the result ascending by price.
+
+select license_plate_number,evaluation_date,price
+from carmechanic.m_car
+join carmechanic.m_car_evaluation on c_id = car_id
+order by price ;
+
+54.Which cars were evaluated to be worth more than 10 million,what was the price
+and when did the evaluation take place? The cars should be represented in the result 
+by their license plate number.
+
+select license_plate_number,evaluation_date,price
+from carmechanic.m_car
+join carmechanic.m_car_evaluation on c_id = car_id
+where price > 1e7;
+
+57.How many black cars were evaluated to be worth at least 5 millions?
+
+select count(*)
+from carmechanic.m_car
+join carmechanic.m_car_evaluation on c_id = car_id
+where color = 'black'
+and price >= 5e6;
+
+
+
+58.What is the total repair cost of the car with a license plate number 'ABC201'?
+
+select sum(repair_cost)
+from carmechanic.m_car
+join carmechanic.m_repair on c_id = car_id
+where license_plate_number = 'ABC201';
+
+59.What is the average cost of repairing of green cars?
+
+select avg(repair_cost)
+from carmechanic.m_car
+join carmechanic.m_repair on c_id > car_id
+where color = 'green';
+
+60.What is the average repair cost of all cars first sold in 2003?
+
+select avg(repair_cost)
+from carmechanic.m_car
+join carmechanic.m_repair on c_id = car_id
+where extract(year from first_sell_date) = 2003;
+
+61.List average repair cost of cars of each color .Include only those to which
+at least one car belong that was repaired .Sort the result descending by average 
+repair cost.
+
+select color , avg(repair_cost)
+from carmechanic.m_repair
+join carmechanic.m_car on c_id = car_id
+where color in (select color 
+from carmechanic.m_car
+join carmechanic.m_repair on c_id = car_id)
+group by color
+order by 2 desc;
+
+
+
+62.List average repair cost of cars of each model where this average reapir cost 
+exceeds 100 000.The model should be identified in the result by their identifiers.
+
+select model_id, avg(repair_cost)
+from carmechanic.m_car
+join carmechanic.m_repair on c_id = car_id
+group by model_id
+having avg(repair_cost) > 1e5;
+
+63.List the license plate number, and average repair cost of blue cars that were 
+repaired in at least two different workshops.Sort the list descending by the average 
+repair cost.
+
+select license_plate_number, avg(repair_cost)
+from carmechanic.m_car
+join carmechanic.m_repair on c_id = car_id
+where color = 'blue'
+group by license_plate_number
+having count(distinct workshop_id) >= 2
+order by 2 desc;
+
+68.List car model names for which average first sell price of cars of that model
+greater then 5 million in 2006.
+
+select cm_name
+from carmechanic.m_car
+join carmechanic.m_car_model on cm_id = model_id
+where extract(year from first_sell_date) = 2006
+group by cm_id,cm_name
+having avg(first_sell_price) > 5e6;
+
+69.For each wrkshop where at least one mechanic from debrecen have ever worked,
+determine the average salary of the mechanics from Debrecen.The address of mechanics
+who live in Debrecen starts with 'Debrecen'.Sort the result descending by average 
+salary.
+
+select workshop_id,avg(salary)
+from carmechanic.m_works_for
+join carmechanic.m_mechanic on m_id = mechanic_id
+where workshop_id in (select workshop_id
+from carmechanic.m_works_for
+join carmechanic.m_mechanic on m_id = mechanic_id
+where address like 'Debrecen%')
+and address like 'Debrecen%'
+group by workshop_id
+order by 2 desc;
+
 
