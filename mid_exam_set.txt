@@ -233,6 +233,30 @@ group by license_plate_number
 having count(distinct workshop_id) >= 2
 order by 2 desc;
 
+64.In each workshop for which at least three mechanics have ever worked, list the total
+salary associated with all employment in that workshop.The workshop should be 
+represented in the result by their names.Sort the list descending by the total salary.
+
+select w_name, sum(salary)
+from carmechanic.m_workshop 
+join carmechanic.m_works_for on w_id = workshop_id
+group by w_id,w_name
+having count(distinct mechanic_id) >= 3
+order by 2 desc;
+
+67.What is the average evalution price of cars of each model?Only include model with at
+least one evaluted car. The models should be represented in the result by their 
+identifiers.
+
+select model_id , avg(price)
+from carmechanic.m_car
+join carmechanic.m_car_evaluation on c_id = car_id
+where model_id in (select model_id
+from carmechanic.m_car
+join carmechanic.m_car_evaluation on c_id = car_id)
+group by model_id;
+
+
 68.List car model names for which average first sell price of cars of that model
 greater then 5 million in 2006.
 
@@ -258,5 +282,52 @@ where address like 'Debrecen%')
 and address like 'Debrecen%'
 group by workshop_id
 order by 2 desc;
+
+74.List the name of workshops where at least one mechanic from Eger has ever worked.
+Mechanic from Eger have an address starting with 'Eger'.Each workshop should appear 
+only once.
+
+select w_name Workshop
+from carmechanic.m_workshop
+join carmechanic.m_works_for on w_id = workshop_id
+join carmechanic.m_mechanic m on m_id = mechanic_id
+where m.address like 'Eger%'
+group by w_id,w_name;
+
+
+
+76.Which cars were repaired in the workshop named 'Kobela Bt.'?The cars should be 
+represented in the result by their license plate number,each only once sorted 
+alphabetically.
+
+select distinct license_plate_number
+from carmechanic.m_car
+join carmechanic.m_repair on c_id = car_id
+join carmechanic.m_workshop on w_id = workshop_id
+where w_name = 'Kobela Bt.'
+order by 1;
+
+
+77.In which workshop was the car with a license plate number 'AIT601' was repaired?
+The workshop should be represented in the result by their names , each only once.
+
+select w_name
+from carmechanic.m_car
+join carmechanic.m_repair on c_id = car_id
+join carmechanic.m_workshop on w_id = workshop_id
+where license_plate_number = 'AIT601'
+group by w_id,w_name;
+
+80.For each car purchased in 2006,list the name of its new owners and license plate 
+number of the car.Sort the result alphabetical orders of their names.
+
+select o_name , license_plate_number
+from carmechanic.m_car
+join carmechanic.m_owns on c_id = car_id
+join carmechanic.m_owner on o_id = owner_id
+where extract(year from date_of_buy) = 2006
+order by 1;
+
+
 
 

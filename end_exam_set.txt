@@ -54,3 +54,10 @@ join carmechanic.m_workshop on w_id = workshop_id
 where w_name = 'Harmat Kft.')
 group by m_id,m_name,m.address,tax_number;
 
+
+12.List all data of cars that have never been evaluated?
+
+select *
+from carmechanic.m_car
+where c_id not in (select car_id
+from carmechanic.m_car_evaluation);
