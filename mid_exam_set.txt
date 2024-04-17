@@ -423,6 +423,79 @@ from carmechanic.m_car
 where extract(year from first_sell_date) between 2002 and 2005);
 
 
+91.List the license plate number and color of the cars that were evaluated during
+earliest car evaluation.
+
+select license_plate_number,color
+from carmechanic.m_car
+join carmechanic.m_car_evaluation on c_id = car_id
+where evaluation_date = (select min(evaluation_date)
+from carmechanic.m_car_evaluation);
+
+92.List the license plate number and color of cars that were evaluated during latest
+car evaluations.
+
+select license_plate_number,color
+from carmechanic.m_car
+join carmechanic.m_car_evaluation on c_id = car_id
+where evaluation_date = (select max(evaluation_date)
+from carmechanic.m_car_evaluation);
+
+93.List the license plate number and color of the cars that were repaired for the
+shortest time (considering the finished repairs only).
+
+select license_plate_number , color, end_date ,start_date 
+from carmechanic.m_car
+join carmechanic.m_repair on c_id = car_id
+where end_date-start_date = (select min(end_date-start_date)
+from carmechanic.m_repair);
+
+94.List the license plate number and color of the cars having the highest 
+evalution price.
+
+select license_plate_number,color
+from carmechanic.m_car
+join carmechanic.m_car_evaluation on c_id = car_id
+where price = (select max(price)
+from carmechanic.m_car_evaluation);
+
+95.List all data of green cars having highest first sell price.
+
+select *
+from carmechanic.m_car
+where color = 'green'
+and first_sell_price = (select max(first_sell_price)
+from carmechanic.m_car
+where color = 'green');
+
+96.List the name of latest owner of the car with an identifier 172.
+
+select o_name
+from carmechanic.m_owner
+join carmechanic.m_owns on o_id = owner_id
+where car_id = 172
+and date_of_buy = (select max(date_of_buy)
+from carmechanic.m_owns
+where car_id = 172);
+
+98.List the name of the first owner of the car with an identifier 178.
+
+select o_name 
+from carmechanic.m_owns
+join carmechanic.m_owner on o_id = owner_id
+where car_id = 178
+and date_of_buy = (select min(date_of_buy)
+from carmechanic.m_owns 
+where car_id = 178);
+
+99.List all data of green cars having lowest first sell price.
+
+select *
+from carmechanic.m_car
+where color = 'green'
+and first_sell_price = (select min(first_sell_price)
+from carmechanic.m_car
+where color = 'green');
 
 
 
