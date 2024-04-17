@@ -357,6 +357,43 @@ join carmechanic.m_owner on o_id = owner_id
 where extract(year from date_of_buy) = 2006
 order by 1;
 
+81.List all data of car evaluation where the price is at least 1 million greater than 
+the average.
+
+select *
+from carmechanic.m_car_evaluation
+where price >= (select avg(price)+1e6
+from carmechanic.m_car_evaluation);
+
+82.List all data of car evalution where price is at least 1.5 million less 
+than the average.
+
+select * 
+from carmechanic.m_car_evaluation
+where price <= (select avg(price) - 15e5
+from carmechanic.m_car_evaluation);
+
+83.List the license plate number of cars whose first sell price is greater than 
+average first sell price of cars first sold after 2020.
+
+select license_plate_number 
+from carmechanic.m_car
+where first_sell_price > 
+(select avg(first_sell_price)
+from carmechanic.m_car
+where extract(year from first_sell_date) >= 2020);
+
+
+
+84.List all data of repairs with minimum cost.
+
+select *
+from carmechanic.m_repair
+where repair_cost = (select min(repair_cost)
+from carmechanic.m_repair);
+
+
+
 85.List license plate number of cars whose first sell price whose first sell 
 price is greater than average first sell price of blue cars.
 
@@ -365,6 +402,29 @@ from carmechanic.m_car
 where first_sell_price > (select avg(first_sell_price)
 from carmechanic.m_car
 where color = 'blue');
+
+86.List license plate numbers whose first sell price is less than average first sell
+price of blue cars.
+
+select license_plate_number 
+from carmechanic.m_car
+where first_sell_price < 
+(select avg(first_sell_price)
+from carmechanic.m_car
+where color = 'blue');
+
+87.List the license plate number of cars whose first sell price is less than the first 
+sell price of all cars first sold between 2002 and 2005.
+
+select license_plate_number 
+from carmechanic.m_car
+where first_sell_price < (select min(first_sell_price)
+from carmechanic.m_car
+where extract(year from first_sell_date) between 2002 and 2005);
+
+
+
+
 
 
 
