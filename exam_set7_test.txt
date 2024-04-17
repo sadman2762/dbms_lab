@@ -97,3 +97,4 @@ and first_sell_price =
 (select min(first_sell_price)
 from carmechanic.m_car
 where color = 'green');
+

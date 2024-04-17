@@ -1,0 +1,144 @@
+2.List all data of car evaluations where the price is less than 500 000. Sort the 
+result ascending by the evaluation date.
+
+select * 
+from carmechanic.m_car_evaluation
+where price < 5e5
+order by evaluation_date;
+
+3.What is the name and address of the workshop whose manager has an identifier of
+301?
+
+select w_name , address
+from carmechanic.m_workshop
+where manager_id = 301;
+
+
+4.What is the color and first sell price of the car with a license plate number 
+'ORA025'?
+
+select color, first_sell_price
+from carmechanic.m_car
+where license_plate_number = 'ORA025';
+
+5.List all data of car models of the 'Opel' brand?
+
+select *
+from carmechanic.m_car_model
+where make = 'Opel';
+
+
+
+6.What is the license plate number , color and first sell price of the car 
+with an identifier 150?
+
+select license_plate_number , color, first_sell_price
+from carmechanic.m_car
+where c_id = 150;
+
+7.List the name , address and phone number of all mechanics sorted ascending
+ by their ages, i.e. starting with the youngest.
+
+ select m_name , address , phone
+from carmechanic.m_mechanic
+order by birth_date desc;
+
+
+
+
+8.List all data of car evaluations where price was less than 500 000. Sort the result 
+ascending by the car evaluation dates.
+
+select * 
+from carmechanic.m_car_evaluation
+where price < 5e5
+order by evaluation_date;
+
+9.List all data of the car with a license plate number 'ORA025'?
+
+select * 
+from carmechanic.m_car
+where license_plate_number = 'ORA025';
+
+10.List all car makes sorted descending by their names.
+
+select brand 
+from carmechanic.m_car_make
+order by 1 desc;
+
+11.List the identifier and name of the car owners who live in debrecen and whose
+name is at most 10 chracters long.Car owners from Debrecen have an address starting
+with 'Debrecen'.Sort the list ascending by the names.
+
+select o_id , o_name
+from carmechanic.m_owner
+where address like 'Debrecen%'
+and length(o_name) <= 10
+order by o_name;
+
+12.List brand names that ends with 't' and contains at least one 'r'.Sort the list 
+alphabetically.
+
+select brand 
+from carmechanic.m_car_make
+where brand like '%t'
+and lower(brand) like '%r%'
+order by brand;
+
+13. List the identifier , color and license plate number of the cars with an 
+unknown first sell price or license plate number ending with two zeors.Sort the list by 
+color first then by license plate number.
+
+select c_id , color , license_plate_number
+from carmechanic.m_car
+where first_sell_price is null
+or license_plate_number like '%00'
+order by 2,3;
+
+14.List all data of car owner with a length longer than 10 chracters and an unknown 
+address , sorted by their names.
+
+select *
+from carmechanic.m_owner
+where length(o_name) > 10
+and address is null
+order by o_name;
+
+15.List all data of mechanics with a phone number starting with '+3620' and 
+sorted ascending by their names.
+
+select * 
+from carmechanic.m_mechanic
+where phone like '+3620%'
+order by m_name;
+
+
+
+17.List in alphabetical order car brand names consisting of multiple words i.e. 
+those containing at least one space or hyphen.
+
+select *
+from carmechanic.m_car_make
+where brand like '% %'
+or brand like '%-%';
+
+18.List the make and model names of sports car model with fog lights.The details 
+of these model contain the string 'sports' and 'fog lights' . Separate make and model 
+name via space.Sort the list descending by makes, then descending by models.
+
+select make || ' ' || cm_name
+from carmechanic.m_car_model
+where details like '%sports%'
+and details like '%fog lights%'
+order by make desc,cm_name desc;
+
+19.List all data of car models that are not 5-door models i.e, (the string '5-door' 
+does not appear in their details) and whose brand name start with the same letter as 
+their model name.
+
+select * 
+from carmechanic.m_car_model
+where details not like '%5-door%'
+and substr(cm_name,1,1) = substr(make,1,1);
+
+
