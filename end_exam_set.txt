@@ -22,7 +22,7 @@ from carmechanic.m_car
 join carmechanic.m_repair on c_id = car_id
 join carmechanic.m_car_model on cm_id = model_id
 where make = 'Toyota')
-group by license_plate_number,c_id;
+group by license_plate_number;
 
 8.List the license plate number of cars having a repair cost less than any repair cost 
 of a Suzuki car.Each license plate number should appear only once in the result.
@@ -37,7 +37,7 @@ from carmechanic.m_car
 join carmechanic.m_repair on c_id = car_id
 join carmechanic.m_car_model on model_id = cm_id
 where make = 'Suzuki')
-group by car_id,license_plate_number;
+group by license_plate_number;
 
 10.List the name , address and tax number of mechanics who ever had a salary less than
 that of all mechanics who ever worked for the workshop name 'Harmat Kft'.Each mechanic
@@ -52,7 +52,22 @@ from carmechanic.m_mechanic
 join carmechanic.m_works_for on m_id = mechanic_id
 join carmechanic.m_workshop on w_id = workshop_id
 where w_name = 'Harmat Kft.')
-group by m_id,m_name,m.address,tax_number;
+group by m_name,m.address,tax_number;
+
+11.List the name of owner who has never owned an Opel car.
+
+select o_name
+from carmechanic.m_owner
+minus
+select o_name 
+from carmechanic.m_owns
+join carmechanic.m_owner on o_id = owner_id
+where car_id  in (select c_id
+from carmechanic.m_car_model
+join carmechanic.m_car on model_id = cm_id
+where make = 'Opel')
+
+
 
 
 12.List all data of cars that have never been evaluated?
@@ -61,3 +76,37 @@ select *
 from carmechanic.m_car
 where c_id not in (select car_id
 from carmechanic.m_car_evaluation);
+
+13.List all data of cars that were first sold in 2006 or Opel make.
+
+select * 
+from carmechanic.m_car
+left join carmechanic.m_car_model on cm_id = model_id
+where extract(year from first_sell_date) = 2006
+or make = 'Opel';
+
+14.List the name and identifier of workshop where no mechanics from Eger have 
+ever worked.The address of mechanic from Eger starts with 'Eger'.
+
+select w_id,w_name
+from carmechanic.m_workshop
+where w_id not in (select distinct workshop_id
+from carmechanic.m_works_for
+join carmechanic.m_mechanic on m_id = mechanic_id
+where address like 'Eger%');
+
+15.List all data of cars that have been owned someone living in Eger (i.e. someone whose
+address begin with 'Eger') and have been repaired in a workshop in Eger(i.e. in a 
+workshop where address starting with 'Eger').Each car should appear only once in the 
+result.
+
+select *
+from carmechanic.m_car
+where c_id in (select car_id
+from carmechanic.m_owner
+join carmechanic.m_owns on o_id = owner_id
+where address like 'Eger%')
+and c_id in (select car_id
+from carmechanic.m_repair
+join carmechanic.m_workshop on w_id = workshop_id
+where address like 'Eger%');
