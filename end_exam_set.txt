@@ -111,6 +111,16 @@ from carmechanic.m_repair
 join carmechanic.m_workshop on w_id = workshop_id
 where address like 'Eger%');
 
+21.List the license plate number of cars participating in the evaluations with the 
+5 highest evaluation prices.Also give the evaluation price along with license plate 
+numbers.Sort the list descending by the evaluation price.
+
+select license_plate_number, price
+from carmechanic.m_car
+join carmechanic.m_car_evaluation on c_id = car_id
+order by price desc
+fetch first 5 rows only;
+
 22. List the license plate number of cars participating in the evaluations 
 with the 10 lowest evaluation price. Also give the evaluation prices along  with 
 the license plate numbers. Sort the list descending by evaluation price.
@@ -128,18 +138,36 @@ order by price desc;
 one of the lowest three. The models should be represented in the result by 
 their identifiers.
 
-select * from (select model_id,  avg(price) avg
-from carmechanic.m_car
-join carmechanic.m_car_evaluation on c_id = car_id
-where model_id is not null
-group by model_id
-order by avg(price))
-where avg in(
-select distinct avg from
-(select model_id,  avg(price) avg
-from carmechanic.m_car
-join carmechanic.m_car_evaluation on c_id = car_id
-where model_id is not null
-group by model_id)
-order by avg
-fetch first 3 rows only );
+select cm_id,avg(price)
+from carmechanic.m_car_model
+left join carmechanic.m_car on model_id = cm_id
+left join carmechanic.m_car_evaluation on car_id = c_id
+group by cm_id
+order by avg(price)
+fetch first 3 rows only;
+
+
+24.List the total repair cost of cars of each model where this total cost is one of the 
+lowest five where this total cost is one of the lowest five.The models should be 
+represented in the result by their identifiers also by their make and model names.
+
+select cm_id,cm_name,make,sum(repair_cost)
+from carmechanic.m_car 
+join carmechanic.m_car_model on cm_id = model_id
+join carmechanic.m_repair on c_id = car_id
+group by cm_id,make,cm_name
+order by sum(repair_cost)
+fetch first 5 row only;
+
+25.List the mechanics with the two highest salaries who are currently working for 
+'Kobela Bt.' (i.e for whom the end of employment is not given). List only the mechanics 
+name and salary ,sorted descending by salary.
+
+select m_name,salary
+from carmechanic.m_mechanic
+join carmechanic.m_works_for on m_id = mechanic_id
+join carmechanic.m_workshop on w_id = workshop_id
+where w_name = 'Kobela Bt.'
+and end_of_employment is null
+order by salary desc
+fetch first 2 rows only
