@@ -110,3 +110,36 @@ and c_id in (select car_id
 from carmechanic.m_repair
 join carmechanic.m_workshop on w_id = workshop_id
 where address like 'Eger%');
+
+22. List the license plate number of cars participating in the evaluations 
+with the 10 lowest evaluation price. Also give the evaluation prices along  with 
+the license plate numbers. Sort the list descending by evaluation price.
+
+select * from
+(select license_plate_number,price
+from carmechanic.m_car
+join carmechanic.m_car_evaluation on c_id = car_id
+order by  price
+fetch first 10 rows only)
+order by price desc;
+
+
+23.List the average evaluation price of cars of each model where this average is 
+one of the lowest three. The models should be represented in the result by 
+their identifiers.
+
+select * from (select model_id,  avg(price) avg
+from carmechanic.m_car
+join carmechanic.m_car_evaluation on c_id = car_id
+where model_id is not null
+group by model_id
+order by avg(price))
+where avg in(
+select distinct avg from
+(select model_id,  avg(price) avg
+from carmechanic.m_car
+join carmechanic.m_car_evaluation on c_id = car_id
+where model_id is not null
+group by model_id)
+order by avg
+fetch first 3 rows only );
