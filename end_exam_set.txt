@@ -171,3 +171,37 @@ where w_name = 'Kobela Bt.'
 and end_of_employment is null
 order by salary desc
 fetch first 2 rows only
+
+84.Create a view that shows the year(s) for which the most evaluations of cars 
+with this first-sell year took place.
+
+select b1,b2 from
+(select max(cnt) a2 from
+(select extract(year from first_sell_date) ,count(*) cnt
+from carmechanic.m_car
+join carmechanic.m_car_evaluation on c_id = car_id
+group by extract(year from first_sell_date)))
+join
+(select extract(year from first_sell_date) b1,count(*) b2
+from carmechanic.m_car
+join carmechanic.m_car_evaluation on c_id = car_id
+group by extract(year from first_sell_date))
+on b2 = a2
+
+85.Create a view for each workshops shows the car model(s) involved in the most 
+repair in that workshop Both the workshops and the car models should be represented 
+by identifiers in the view .
+
+select a1,model_id,b2 from 
+(select workshop_id a1,max(cnt) b1
+from (select workshop_id,model_id,count(*) cnt
+from carmechanic.m_car
+join carmechanic.m_repair on c_id = car_id
+group by workshop_id,model_id)
+group by workshop_id)
+join
+ (select workshop_id a2,model_id,count(*) b2
+from carmechanic.m_car
+join carmechanic.m_repair on c_id = car_id
+group by workshop_id,model_id)
+on a1 = a2 and b1 = b2;
