@@ -141,6 +141,16 @@ from carmechanic.m_car_model
 where details not like '%5-door%'
 and substr(cm_name,1,1) = substr(make,1,1);
 
+27.List the start date of employment (together with associated salary) that are at least 5
+years long and have not ended yet.(i.e. the end date is unkown)
+
+select start_of_employment,salary
+from carmechanic.m_works_for
+where months_between(sysdate,start_of_employment) >= 5
+and end_of_employment is null;
+
+
+
 51.Which cars were evaluated in 2011?The cars should be represented in the result by 
 their license plate number ,each car only once.
 
