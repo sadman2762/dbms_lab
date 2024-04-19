@@ -172,6 +172,53 @@ and end_of_employment is null
 order by salary desc
 fetch first 2 rows only
 
+81.Create a view that lists the license plate number of all cars together with the 
+name of their latest owners.If a car has no owner the string 'no owner' should appear 
+ next to thier license plate number.
+
+select a2,nvl(o_name,'no name') from
+(select license_plate_number a1,o_name,date_of_buy b1
+from carmechanic.m_car
+left join carmechanic.m_owns on c_id = car_id
+left join carmechanic.m_owner on o_id = owner_id
+order by 1)
+ right join 
+(select license_plate_number a2,max(date_of_buy) b2
+from carmechanic.m_car
+left join carmechanic.m_owns on c_id = car_id
+left join carmechanic.m_owner on o_id = owner_id
+group by license_plate_number)
+on a1 = a2 and b1 = b2;
+
+
+82.Create a view that,for each color, list the license plate number and first sell 
+price of the car(s) with that color having the highest first sell price.
+
+select a1,c1,b1 from
+(select color a2 ,max(first_sell_price) b2
+from carmechanic.m_car
+group by color )
+join
+(select color a1,license_plate_number c1,first_sell_price b1
+from carmechanic.m_car)
+on a1 = a2 and b1=b2;
+
+83.Create a view that lists the name of car makes and models with most cars in our
+database.
+
+select * from 
+(select max(cnt) a1 from
+(select cm_id,cm_name,make,count(*) cnt
+from carmechanic.m_car_model
+join carmechanic.m_car on model_id = cm_id
+group by cm_id,cm_name,make))
+join
+(select cm_name,make,count(*) a2
+from carmechanic.m_car_model
+join carmechanic.m_car on model_id = cm_id
+group by cm_id,cm_name,make)
+on a1 = a2
+
 84.Create a view that shows the year(s) for which the most evaluations of cars 
 with this first-sell year took place.
 
