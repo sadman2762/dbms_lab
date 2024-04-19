@@ -141,15 +141,65 @@ from carmechanic.m_car_model
 where details not like '%5-door%'
 and substr(cm_name,1,1) = substr(make,1,1);
 
+21.List the identifier and repair time (in days) of cars that were repaired in the 
+workshop with an identifier of 102 for at most 3 days.Also include repairs that are 
+still in progress (have not ended yet) but may finish within three days of the 
+start date.
+
+select car_id, end_date - start_date
+from carmechanic.m_repair
+where workshop_id = 102
+and (end_date - start_date <= 3
+or sysdate - start_date <=3);
+
+22.List the license plate number and first sell date of cars that were first sold in 2011,
+2009 0r 2005.
+
+select license_plate_number,first_sell_date
+from carmechanic.m_car
+where extract(year from first_sell_date) in (2005,2009,2011);
+
+24.List all data of repairs that crossed a year boundary.(the year of end_date differs 
+from the year of start date).Sort the list descending by the year of repairs.
+
+select * 
+from carmechanic.m_repair
+where extract(year from start_date) != extract(year from end_date)
+order by end_date - start_date desc;
+
 27.List the start date of employment (together with associated salary) that are at least 5
 years long and have not ended yet.(i.e. the end date is unkown)
 
 select start_of_employment,salary
 from carmechanic.m_works_for
-where months_between(sysdate,start_of_employment) >= 5
+where months_between(sysdate,start_of_employment)/12 >= 5
 and end_of_employment is null;
 
+28.List the license_plate_number and first_sell_date of cars that were first sold in 
+2011.Sort the list alphabetically by license plate number.
 
+select license_plate_number,first_sell_date
+from carmechanic.m_car
+where extract(year from first_sell_date) = 2011
+order by 1 ;
+
+29.List the identifiers of cars (together with repair time in days) that were repaired 
+for more than 30 days.Sort the result descending by repair time .(i.e the longest repair
+should appear first).
+
+select car_id, end_date - start_date
+from carmechanic.m_repair
+where end_date - start_date > 30
+order by 2 desc;
+
+30.List the date of car evaluations (together with associated car identifiers ) that took
+place within last 4 years and more than 15 years ago.Sort the list by evaluation
+dates.
+
+select car_id,evaluation_date
+from carmechanic.m_car_evaluation
+where months_between(sysdate,evaluation_date)/12 <= 4
+or months_between(sysdate,evaluation_date)/12 > 15
 
 51.Which cars were evaluated in 2011?The cars should be represented in the result by 
 their license plate number ,each car only once.
