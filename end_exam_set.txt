@@ -172,6 +172,60 @@ and end_of_employment is null
 order by salary desc
 fetch first 2 rows only
 
+71.Create a view that shows the license plate number of the gray car(s) with 
+the highest first_sell price.
+
+select license_plate_number
+from carmechanic.m_car
+where color = 'gray'
+and first_sell_price = (select max(first_sell_price)
+from carmechanic.m_car
+where color = 'gray');
+
+72.Create a view that lists the name of car brands and model with no cars.
+
+select cm_name , make
+from carmechanic.m_car_model
+left join carmechanic.m_car on cm_id = model_id
+group by cm_id,make,cm_name
+having count(c_id) = 0;
+
+73.Create a view that lists the name and address of workshops in Debrecen, 
+ with the  name and address of the workshop's manager if this manager does not
+  live in Debrecen. Addresses in Debrecen start with 'Debrecen'.
+
+  select * from
+(select w_name,w.address w,m_name,m.address
+from carmechanic.m_workshop w
+join carmechanic.m_mechanic m on m_id = manager_id
+where m.address like 'Debrecen%')
+where w like 'Debrecen%';
+
+74.Create a view that lists the name of workshop managers ,the name of workshop they 
+manage and the name of workshop they ever worked for if these workshops are different 
+from the workshop they manage.
+
+select m_name,w_name
+from carmechanic.m_workshop
+left join carmechanic.m_mechanic on m_id = manager_id
+union 
+select m_name,w_name
+from carmechanic.m_workshop
+ join carmechanic.m_works_for on w_id = workshop_id
+ join carmechanic.m_mechanic on m_id = mechanic_id
+where m_id in (select manager_id from carmechanic.m_workshop)
+order by 1
+
+75.Create a view that shows the name of the workshop where the longest 
+(finished) repair took place,together with the duration of this repair in days.
+
+select w_name,end_date - start_date
+from carmechanic.m_repair
+join carmechanic.m_workshop on w_id = workshop_id
+where end_date - start_date = (select max(end_date - start_date)
+from carmechanic.m_repair);
+
+
 81.Create a view that lists the license plate number of all cars together with the 
 name of their latest owners.If a car has no owner the string 'no owner' should appear 
  next to thier license plate number.
