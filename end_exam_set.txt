@@ -13,7 +13,7 @@ order by make ,cm_name;
 repair cost of Toyota cars.Each license plate number should appear only once in the 
 result.
 
-select license_plate_number
+select distinct license_plate_number
 from carmechanic.m_car
 join carmechanic.m_repair on c_id = car_id
 where repair_cost > 
@@ -21,13 +21,12 @@ where repair_cost >
 from carmechanic.m_car
 join carmechanic.m_repair on c_id = car_id
 join carmechanic.m_car_model on cm_id = model_id
-where make = 'Toyota')
-group by license_plate_number;
+where make = 'Toyota');
 
 8.List the license plate number of cars having a repair cost less than any repair cost 
 of a Suzuki car.Each license plate number should appear only once in the result.
 
-select license_plate_number
+select distinct license_plate_number
 from carmechanic.m_car
 join carmechanic.m_repair
 on c_id = car_id
@@ -36,8 +35,8 @@ where repair_cost <
 from carmechanic.m_car
 join carmechanic.m_repair on c_id = car_id
 join carmechanic.m_car_model on model_id = cm_id
-where make = 'Suzuki')
-group by license_plate_number;
+where make = 'Suzuki');
+
 
 10.List the name , address and tax number of mechanics who ever had a salary less than
 that of all mechanics who ever worked for the workshop name 'Harmat Kft'.Each mechanic
