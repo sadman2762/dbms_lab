@@ -199,7 +199,57 @@ dates.
 select car_id,evaluation_date
 from carmechanic.m_car_evaluation
 where months_between(sysdate,evaluation_date)/12 <= 4
-or months_between(sysdate,evaluation_date)/12 > 15
+or months_between(sysdate,evaluation_date)/12 > 15;
+
+31.How many cars of each color in our database?Sort the result descending by the 
+number of cars.
+
+select color, count(*)
+from carmechanic.m_car
+group by color
+order by 2 desc;
+
+33.When was each car bought by its latest owner?The cars should be represented in the
+result by their identifiers.Sort the result descending by the date of latest buy.
+
+select car_id,max(date_of_buy)
+from carmechanic.m_owns
+group by car_id
+order by 2 desc;
+
+34.What is the difference between highest and lowest price to which each car evaluated?
+The cars should be representred in the result by their identifiers.Sort the list 
+descending by the price difference.
+
+select car_id, max(price) - min(price)
+from carmechanic.m_car_evaluation
+group by car_id
+order by 2 desc;
+
+35.How many new cars were sold in each year(based on first sell dates)?Sort the result 
+descending by years .
+
+select extract(year from first_sell_date),count(*)
+from carmechanic.m_car
+group by extract(year from first_sell_date)
+order by 1 desc;
+
+36.What is the total repair cost of each car? The cars should be represented in the 
+result by their identifiers.Sort the result ascending by the total repair cost?
+
+select car_id,sum(repair_cost)
+from carmechanic.m_repair
+group by car_id
+order by 2;
+
+37.When was the latest repair finished in each workshop?The workshop should be represented
+in the result by their identifiers.Sort the result descending by the date of latest repair.
+
+select workshop_id,max(end_date)
+from carmechanic.m_repair
+group by workshop_id
+order by 2 desc;
+
 
 51.Which cars were evaluated in 2011?The cars should be represented in the result by 
 their license plate number ,each car only once.
