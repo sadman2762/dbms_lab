@@ -305,3 +305,26 @@ from carmechanic.m_car
 join carmechanic.m_repair on c_id = car_id
 group by workshop_id,model_id)
 on a1 = a2 and b1 = b2;
+
+91.Grant select privilege to the user named 'dzsoni' on your 'm_mechanic' table.
+
+GRANT SELECT ON m_mechanic TO dzsoni;
+
+92.Grant INSERT and UPDATE privileges to the user names 'dszoni' on your 'm_owner' table.
+
+GRANT INSERT, UPDATE ON m_owner TO dszoni;
+
+
+
+
+93.Grant all privileges to all users on your 'm_car' table.
+
+GRANT ALL PRIVILEGES ON m_car TO PUBLIC;
+
+94.Revoke the SELECT priviledge from the user named 'dzsoni' on your 'm_mechanic' table.
+
+REVOKE SELECT ON m_mechanic FROM dzsoni;
+
+95.Revoke all privileges from all users on your 'm_car' table.
+
+REVOKE ALL PRIVILEGES ON m_car FROM PUBLIC;
