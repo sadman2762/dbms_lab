@@ -250,6 +250,55 @@ from carmechanic.m_repair
 group by workshop_id
 order by 2 desc;
 
+41.Which cars were repaired for more than four times?The cars should be represented 
+in the result by their identifiers , sorted.
+
+select car_id
+from carmechanic.m_repair
+group by car_id
+having count(*) > 4
+order by 1;
+
+43.Which mechanics have worked for more than one workshop(regardless of how many times)?
+The mechanics should be represented in the result by their identofiers.
+
+select mechanic_id
+from carmechanic.m_works_for
+group by mechanic_id
+having count(distinct workshop_id) > 1;
+
+44.Which makes have more than 7 models?
+
+select make
+from carmechanic.m_car_model
+group by make
+having count(*) > 7;
+
+45.Which workshops have done more than 60 repairs (including those currently in progress)?
+The workshop should be represented in the result by their identifiers , sorted.
+
+select workshop_id
+from carmechanic.m_repair
+group by workshop_id
+having count(*) > 60
+order by 1;
+
+46.Which cars were repaired for a total cost greater than 800 000, and what is the 
+total cost?The cars should be represented in the result by their identifier.
+
+select car_id,sum(repair_cost)
+from carmechanic.m_repair
+group by car_id
+having sum(repair_cost) > 8e5;
+
+49.Which mechanics highest salary was no more than 200 000?The mechanics should be 
+represented in the result by their identifiers.
+
+select mechanic_id
+from carmechanic.m_works_for
+group by mechanic_id
+having max(salary) <= 2e5;
+
 
 51.Which cars were evaluated in 2011?The cars should be represented in the result by 
 their license plate number ,each car only once.
