@@ -216,6 +216,17 @@ digits), and the mechanic who took part in this training (an integer of at most 
 with a reference to 'm_mechanic' table.The primary key consists of the training identifier 
 and mechanic identifier . Assign a name to each constraint.
 
+CREATE TABLE training (
+  id CHAR(10 CHAR),
+  name VARCHAR2(20 CHAR),
+  description VARCHAR2(50 CHAR),
+  start_date DATE,
+  end_date DATE,
+  cost NUMBER(5),
+  mechanic_id NUMBER(5) CONSTRAINT fk_training REFERENCES m_mechanic,
+  CONSTRAINT pk_training PRIMARY KEY(id,mechanic_id)
+);
+
 
 
 
@@ -236,7 +247,26 @@ CREATE TABLE work_plan (
     CONSTRAINT pk_work_plan PRIMARY KEY (workday, mechanic)
 );
 
+42.Phone numbers of mechanics are no longer needed, so delete the 'phone' column from the 
+'m_mechanic' table.
 
+alter table m_mechanic drop column phone;
+
+
+43. Delete the table 'm_owner' and m_owns'. Take into account the foreign keys referencing
+these tables. You may use multiple statements to solve this take.
+
+drop table m_owner cascade constraints purge;
+
+drop table m_owns cascade constraints purge;
+
+45. Delete the tables 'm_works_for', 'm_workshop', and 'm_mechanic'. Take into account 
+the foreign keys referencing these tables. You may use multiple statements to 
+solve this task.
+
+drop table m_works_for cascade constraints;
+drop table m_workshop cascade constraints;
+drop table m_mechanic cascade constraints;  
 
 
 71.Create a view that shows the license plate number of the gray car(s) with 
