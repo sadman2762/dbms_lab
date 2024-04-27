@@ -16,8 +16,8 @@ result.
 select distinct license_plate_number
 from carmechanic.m_car
 join carmechanic.m_repair on c_id = car_id
-where repair_cost > 
-(select max(repair_cost)
+where repair_cost >all 
+(select repair_cost
 from carmechanic.m_car
 join carmechanic.m_repair on c_id = car_id
 join carmechanic.m_car_model on cm_id = model_id
@@ -30,8 +30,8 @@ select distinct license_plate_number
 from carmechanic.m_car
 join carmechanic.m_repair
 on c_id = car_id
-where repair_cost < 
-(select min(repair_cost)
+where repair_cost <any 
+(select repair_cost
 from carmechanic.m_car
 join carmechanic.m_repair on c_id = car_id
 join carmechanic.m_car_model on model_id = cm_id
@@ -40,13 +40,13 @@ where make = 'Suzuki');
 
 10.List the name , address and tax number of mechanics who ever had a salary less than
 that of all mechanics who ever worked for the workshop name 'Harmat Kft'.Each mechanic
-should appear only once in the result.
+should appear only once in the result.*
 
 select m_name,m.address,tax_number
 from carmechanic.m_mechanic m
 join carmechanic.m_works_for on m_id = mechanic_id
-where salary < 
-(select  min(salary)
+where salary < all
+(select  salary
 from carmechanic.m_mechanic
 join carmechanic.m_works_for on m_id = mechanic_id
 join carmechanic.m_workshop on w_id = workshop_id
@@ -118,7 +118,7 @@ select license_plate_number, price
 from carmechanic.m_car
 join carmechanic.m_car_evaluation on c_id = car_id
 order by price desc
-fetch first 5 rows only;
+fetch first 5 rows with ties;
 
 22. List the license plate number of cars participating in the evaluations 
 with the 10 lowest evaluation price. Also give the evaluation prices along  with 
