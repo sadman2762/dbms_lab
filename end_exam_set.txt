@@ -247,6 +247,12 @@ CREATE TABLE work_plan (
     CONSTRAINT pk_work_plan PRIMARY KEY (workday, mechanic)
 );
 
+41.Add a new column to your 'm_mechanic' table.The new column should be named 'bonus', an 
+integer of at most 6 digits, and its value must be at least 2000.
+
+ALTER TABLE m_mechanic
+  ADD bonus NUMBER(6) CHECK(bonus >= 2000);
+
 42.Phone numbers of mechanics are no longer needed, so delete the 'phone' column from the 
 'm_mechanic' table.
 
@@ -260,13 +266,104 @@ drop table m_owner cascade constraints purge;
 
 drop table m_owns cascade constraints purge;
 
+44.Delete primary key constraint from 'm_owns' table.
+
+ALTER TABLE m_owns
+DROP PRIMARY KEY;
+
+
+
+
 45. Delete the tables 'm_works_for', 'm_workshop', and 'm_mechanic'. Take into account 
 the foreign keys referencing these tables. You may use multiple statements to 
 solve this task.
 
 drop table m_works_for cascade constraints;
 drop table m_workshop cascade constraints;
-drop table m_mechanic cascade constraints;  
+drop table m_mechanic cascade constraints;
+
+51.Insert cars from the 'carmechanic' schema into your 'm_car' table that ever had an owner
+with a last name of 'Jakab'(i.e. a name starting with Jakab and a space) and whose color is
+either 'gray' or 'blue'.
+
+52.Insert owners from 'carmechanic' schema into your 'm_owner' table who ever had a toyota 
+car.
+
+
+
+53.Insert car models with no cars from the 'carmechanic' schema into your 'm_car_model'
+table.
+
+54.Insert car models with the string 'airbag' in their details from the carmechanic schema 
+into your 'm_car_model' table.
+
+56.Delete repairs of black cars that were finished in 2018
+
+delete from m_repair 
+where extract(year from end_date)=2018 and 
+car_id in (select c_id from carmechanic.m_car
+ where color = 'black');
+
+57.The workshop named 'Kerekes Alex Szervize' is closing down (you may assume that there 
+is only one workshop with that name). Delete the employment of all mechanics currently 
+working there.More specifically: delete rows from the 'm_works_for' table that represent
+ an employment at this workshop with an unspecified end of employment.
+
+ delete from m_works_for 
+ where end_of_employment is null 
+ and workshop_id = (select w_id from carmechanic.m_workshop
+  where w_name = 'Kerekes Alex Szervize');
+
+58.Delete car brands with no models in our database.
+
+DELETE FROM m_car_make
+WHERE brand in (
+  select brand from carmechanic.m_car_make
+  minus
+  select make from carmechanic.m_car_model
+);
+
+61.Increase by 10% the cost of repairs that were finished between January 1,2018 and March
+ 31, 2019 in the workshop named 'Kobela Bt.'(you may assume that there is only one workshop
+ with that name).
+
+UPDATE m_repair
+SET repair_cost = repair_cost * 1.1  
+WHERE car_id in(select car_id
+from carmechanic.m_repair
+join carmechanic.m_workshop on w_id = workshop_id
+where w_name = 'Kobela Bt.'
+and end_date >= '2018-01-01'
+and end_date <= '2019-03-31');
+
+
+
+62. Decrease the repair cost of the red and the black cars by 10% of the car's first-sell
+ price.If the first-sell price is unknown, then the repair cost should be unchanged.
+
+UPDATE m_repair
+SET repair_cost = CASE
+    WHEN c.first_sell_price IS NOT NULL THEN r.repair_cost - (0.1 * c.first_sell_price)
+    ELSE r.repair_cost
+    END
+FROM m_repair r
+JOIN m_car c ON r.car_id = c.c_id
+WHERE c.color IN ('red', 'black');
+
+64.The youngest mechanic moves in to the oldest. Update the address of the youngest
+ mechanic accordingly.(you may assume that there is only one youngest and one oldest 
+ mechanic)
+
+ 65.Increase the price of car evaluations that took place after 2011 and involved a
+  Hyundai or Suzuki car by 20% of the car's first-sell price.
+
+update m_car_evaluation 
+set price = price + (0.2 * (select first_sell_price from carmechanic.m_car)) 
+where car_id in 
+(select car_id from carmechanic.m_car_evaluation 
+join carmechanic.m_car on car_id = c_id 
+join carmechanic.m_car_model on model_id = cm_id
+where extract(year from evaluation_date) > 2011 and (make = 'Hyundai' or make = 'Suzuki'));
 
 
 71.Create a view that shows the license plate number of the gray car(s) with 
