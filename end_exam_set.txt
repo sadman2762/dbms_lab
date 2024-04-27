@@ -169,7 +169,22 @@ join carmechanic.m_workshop on w_id = workshop_id
 where w_name = 'Kobela Bt.'
 and end_of_employment is null
 order by salary desc
-fetch first 2 rows only
+fetch first 2 rows only;
+
+31.Create a table named 'relative' where the relatives of mechanics are stored.The table 
+should include the following columns (with arbitrary names):identifier(a string of exactly
+10 charcters;this is the primary key),name(a string of at most 40 chracters;must not be
+unknown),gender(a string at most 10 chracters), date of birth (date) and the mechanic 
+connected to this person (an integer of at most 5 digits) with a reference to 'm_mechanic' 
+table.Assign a name to each constraint.
+
+CREATE TABLE relative (
+  id CHAR(10 CHAR) CONSTRAINT pk_relative PRIMARY KEY,
+  name VARCHAR2(40 CHAR) NOT NULL,
+  gender VARCHAR2(10 CHAR),
+  date_of_birth DATE,
+  mechanic NUMBER(5) CONSTRAINT fk_relative  REFERENCES m_mechanic
+)
 
 33.Create a table name 'insurance' including the following columns(with arbitrary names):
 insurance number (a string exactly 8 chracters;this is the primary key),
@@ -179,6 +194,29 @@ the owner's email address (a string of at most 40 chracters,must not be unknown)
 start and end date of insurance (date) and the monthly cost (an integer at most 5 
 digits and must be greater than 10000).The table should reference to the 'm_car' and 
 'm_owner' table.Assign a name to each constraint.
+
+CREATE TABLE insurance (
+  insurance_number CHAR(8 CHAR),
+  car_id NUMBER(5),
+  owner_id NUMBER(5),
+  email VARCHAR2(40 CHAR) NOT NULL,
+  start_date DATE,
+  end_date DATE,
+  monthly_cost NUMBER(5) CONSTRAINT check_cost CHECK(monthly_cost > 10000),
+  CONSTRAINT fk_1 FOREIGN KEY(car_id) REFERENCES m_car,
+  CONSTRAINT fk_2 FOREIGN KEY(owner_id) REFERENCES m_owner,
+  CONSTRAINT pk_insurance PRIMARY KEY(insurance_number)
+)
+
+34.Some mechanics took part in a refresher training.Create a table named 'training'
+including the following columns(with arbitrary names): identifier (a string of exactly
+10 chracters), names (a string of at most 20 chracters), description (a string of at most 
+50 chracters), the start and end dates of training(dates),cost (an integer of at most 5 
+digits), and the mechanic who took part in this training (an integer of at most 5 digits)
+with a reference to 'm_mechanic' table.The primary key consists of the training identifier 
+and mechanic identifier . Assign a name to each constraint.
+
+
 
 
 35. The mechanics decided to create a work plan specifying the assignment of mechanics to 
