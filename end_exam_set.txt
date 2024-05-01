@@ -515,7 +515,7 @@ on a1 = a2 and b1=b2;
 database.
 
 create view view2 as
-select * from 
+select cm_name,make from 
 (select max(cnt) a1 from
 (select cm_id,cm_name,make,count(*) cnt
 from carmechanic.m_car_model
@@ -526,13 +526,13 @@ join
 from carmechanic.m_car_model
 join carmechanic.m_car on model_id = cm_id
 group by cm_id,cm_name,make)
-on a1 = a2
+on a1 = a2;
 
 84.Create a view that shows the year(s) for which the most evaluations of cars 
-with this first-sell year took place.
+with this first sell year took place.
 
 create view view2 as
-select b1,b2 from
+select b1 from
 (select max(cnt) a2 from
 (select extract(year from first_sell_date) ,count(*) cnt
 from carmechanic.m_car
@@ -543,14 +543,14 @@ join
 from carmechanic.m_car
 join carmechanic.m_car_evaluation on c_id = car_id
 group by extract(year from first_sell_date))
-on b2 = a2
+on b2 = a2;
 
 85.Create a view for each workshops shows the car model(s) involved in the most 
 repair in that workshop Both the workshops and the car models should be represented 
 by identifiers in the view .
 
 create view view2 as
-select a1,model_id,b2 from 
+select a1,model_id from 
 (select workshop_id a1,max(cnt) b1
 from (select workshop_id,model_id,count(*) cnt
 from carmechanic.m_car
