@@ -80,9 +80,12 @@ from carmechanic.m_car_evaluation);
 
 select * 
 from carmechanic.m_car
-left join carmechanic.m_car_model on cm_id = model_id
 where extract(year from first_sell_date) = 2006
-or make = 'Opel';
+union
+select a.*
+from carmechanic.m_car a
+join carmechanic.m_car_model on cm_id = model_id
+where make = 'Opel';
 
 14.List the name and identifier of workshop where no mechanics from Eger have 
 ever worked.The address of mechanic from Eger starts with 'Eger'.
@@ -110,15 +113,20 @@ from carmechanic.m_repair
 join carmechanic.m_workshop on w_id = workshop_id
 where address like 'Eger%');
 
+
+
 21.List the license plate number of cars participating in the evaluations with the 
 5 highest evaluation prices.Also give the evaluation price along with license plate 
 numbers.Sort the list descending by the evaluation price.
 
-select license_plate_number, price
+select * from
+(select license_plate_number, price
 from carmechanic.m_car
 join carmechanic.m_car_evaluation on c_id = car_id
+where price is not null
 order by price desc
-fetch first 5 rows with ties;
+fetch first 5 rows with ties)
+order by price desc;
 
 22. List the license plate number of cars participating in the evaluations 
 with the 10 lowest evaluation price. Also give the evaluation prices along  with 
@@ -128,8 +136,9 @@ select * from
 (select license_plate_number,price
 from carmechanic.m_car
 join carmechanic.m_car_evaluation on c_id = car_id
+where price is not null
 order by  price
-fetch first 10 rows only)
+fetch first 10 rows with ties)
 order by price desc;
 
 
@@ -137,13 +146,13 @@ order by price desc;
 one of the lowest three. The models should be represented in the result by 
 their identifiers.
 
-select cm_id,avg(price)
-from carmechanic.m_car_model
-left join carmechanic.m_car on model_id = cm_id
-left join carmechanic.m_car_evaluation on car_id = c_id
-group by cm_id
+select model_id,avg(price)
+from  carmechanic.m_car 
+join carmechanic.m_car_evaluation on car_id = c_id
+group by model_id
+having avg(price) is not null
 order by avg(price)
-fetch first 3 rows only;
+fetch first 3 rows with ties;
 
 
 24.List the total repair cost of cars of each model where this total cost is one of the 
@@ -155,21 +164,25 @@ from carmechanic.m_car
 join carmechanic.m_car_model on cm_id = model_id
 join carmechanic.m_repair on c_id = car_id
 group by cm_id,make,cm_name
+having sum(repair_cost) is not null
 order by sum(repair_cost)
-fetch first 5 row only;
+fetch first 5 row with ties;
 
 25.List the mechanics with the two highest salaries who are currently working for 
 'Kobela Bt.' (i.e for whom the end of employment is not given). List only the mechanics 
 name and salary ,sorted descending by salary.
 
-select m_name,salary
+select * from
+(select m_name,salary
 from carmechanic.m_mechanic
 join carmechanic.m_works_for on m_id = mechanic_id
 join carmechanic.m_workshop on w_id = workshop_id
 where w_name = 'Kobela Bt.'
 and end_of_employment is null
+and salary is not null
 order by salary desc
-fetch first 2 rows only;
+fetch first 2 rows with ties)
+order by salary desc;
 
 31.Create a table named 'relative' where the relatives of mechanics are stored.The table 
 should include the following columns (with arbitrary names):identifier(a string of exactly
@@ -184,7 +197,7 @@ CREATE TABLE relative (
   gender VARCHAR2(10 CHAR),
   date_of_birth DATE,
   mechanic NUMBER(5) CONSTRAINT fk_relative  REFERENCES m_mechanic
-)
+);
 
 33.Create a table name 'insurance' including the following columns(with arbitrary names):
 insurance number (a string exactly 8 chracters;this is the primary key),
@@ -206,7 +219,7 @@ CREATE TABLE insurance (
   CONSTRAINT fk_1 FOREIGN KEY(car_id) REFERENCES m_car,
   CONSTRAINT fk_2 FOREIGN KEY(owner_id) REFERENCES m_owner,
   CONSTRAINT pk_insurance PRIMARY KEY(insurance_number)
-)
+);
 
 34.Some mechanics took part in a refresher training.Create a table named 'training'
 including the following columns(with arbitrary names): identifier (a string of exactly
@@ -232,7 +245,7 @@ CREATE TABLE training (
 
 35. The mechanics decided to create a work plan specifying the assignment of mechanics to 
 workshops for each workday. Create a table named 'work_plan' including the following 
-columns(with arbitrary names) workday(date; with a default value of the ecurrent date),
+columns(with arbitrary names) workday(date; with a default value of the current date),
 mechanic(an integer of at most 5 digits) with a reference to the 'm_mechanic' table,
 workshop(an integer of at most 5 digits) with a reference to the 'm_workshop' table and
 primary key of the table consists of the workday and the mechanic's identifier.
@@ -289,13 +302,30 @@ either 'gray' or 'blue'.
 52.Insert owners from 'carmechanic' schema into your 'm_owner' table who ever had a toyota 
 car.
 
-
+insert into m_car
+select * 
+from carmechanic.m_car
+where c_id in(select car_id
+from carmechanic.m_owns
+join carmechanic.m_owner on o_id = owner_id
+where o_name like 'Jakab %')
+and color in ('gray','blue');
 
 53.Insert car models with no cars from the 'carmechanic' schema into your 'm_car_model'
 table.
 
+insert into m_car_model
+select b.*
+from carmechanic.m_car_model b
+left join carmechanic.m_car on cm_id = model_id
+where c_id is null;
+
 54.Insert car models with the string 'airbag' in their details from the carmechanic schema 
 into your 'm_car_model' table.
+insert into m_car_model
+select *
+from carmechanic.m_car_model
+where details like '%airbag%';
 
 56.Delete repairs of black cars that were finished in 2018
 
@@ -333,42 +363,63 @@ WHERE car_id in(select car_id
 from carmechanic.m_repair
 join carmechanic.m_workshop on w_id = workshop_id
 where w_name = 'Kobela Bt.'
-and end_date >= '2018-01-01'
-and end_date <= '2019-03-31');
+and end_date >= date'2018-01-01'
+and end_date <= date'2019-03-31');
 
 
 
 62. Decrease the repair cost of the red and the black cars by 10% of the car's first-sell
  price.If the first-sell price is unknown, then the repair cost should be unchanged.
 
-UPDATE m_repair
-SET repair_cost = CASE
-    WHEN c.first_sell_price IS NOT NULL THEN r.repair_cost - (0.1 * c.first_sell_price)
-    ELSE r.repair_cost
-    END
-FROM m_repair r
-JOIN m_car c ON r.car_id = c.c_id
-WHERE c.color IN ('red', 'black');
+update m_repair
+set repair_cost = repair_cost - (0.1 * (select first_sell_price
+from m_car where c_id = car_id and first_sell_price is not null))
+where car_id in (select c_id from m_car 
+where color in ('red','black'));
+
+63.The workshop named 'Kerekes Alex Szervize' is closing down.(ypu may assume that there is 
+only one workshop with this name) due to this all started repairs must be finished.Set the 
+end date of each unfinished repair to current date and set the repair cost to number of 
+days since the start of the repair multiplied by 10% of the first sell price.
+
+update m_repair
+ set end_date =  sysdate ,
+  repair_cost =  .1 * (select first_sell_price
+ from m_car where c_id = car_id) * (sysdate - start_date)
+ where end_date is null and repair_cost is null  and workshop_id in(select w_id 
+ from m_workshop where w_name = 'Kerekes Alex Szervize');
+
+
 
 64.The youngest mechanic moves in to the oldest. Update the address of the youngest
  mechanic accordingly.(you may assume that there is only one youngest and one oldest 
- mechanic)
+ mechanic).
+
+ update m_mechanic 
+set address = (select address from carmechanic.m_mechanic
+where birth_date is not null
+order by birth_date 
+fetch first row only)
+where birth_date = (select max(birth_date) from carmechanic.m_mechanic);
+
+
 
  65.Increase the price of car evaluations that took place after 2011 and involved a
   Hyundai or Suzuki car by 20% of the car's first-sell price.
 
 update m_car_evaluation 
-set price = price + (0.2 * (select first_sell_price from carmechanic.m_car)) 
-where car_id in 
-(select car_id from carmechanic.m_car_evaluation 
-join carmechanic.m_car on car_id = c_id 
-join carmechanic.m_car_model on model_id = cm_id
-where extract(year from evaluation_date) > 2011 and (make = 'Hyundai' or make = 'Suzuki'));
+set price = price + (0.2 * (select first_sell_price from carmechanic.m_car
+where c_id = car_id)) 
+where extract(year from  evaluation_date) > 2011
+and car_id in (select c_id from m_car
+join m_car_model on model_id = cm_id
+where make in ('Hyundai','Suzuki'));
 
 
 71.Create a view that shows the license plate number of the gray car(s) with 
 the highest first_sell price.
 
+create view view1 as
 select license_plate_number
 from carmechanic.m_car
 where color = 'gray'
@@ -378,6 +429,7 @@ where color = 'gray');
 
 72.Create a view that lists the name of car brands and model with no cars.
 
+create view view1 as
 select cm_name , make
 from carmechanic.m_car_model
 left join carmechanic.m_car on cm_id = model_id
@@ -385,34 +437,40 @@ group by cm_id,make,cm_name
 having count(c_id) = 0;
 
 73.Create a view that lists the name and address of workshops in Debrecen, 
- with the  name and address of the workshop's manager if this manager does not
-  live in Debrecen. Addresses in Debrecen start with 'Debrecen'.
+with the  name and address of the workshop's manager if this manager does not
+live in Debrecen. Addresses in Debrecen start with 'Debrecen'.
 
-  select * from
-(select w_name,w.address w,m_name,m.address
+create view view1 as 
+select w_name,a,m_name,b from (select w_name,w.address a ,manager_id
+from carmechanic.m_workshop w
+where w.address like 'Debrecen%') left join 
+(select m_name, m.address b,m_id
 from carmechanic.m_workshop w
 join carmechanic.m_mechanic m on m_id = manager_id
-where m.address like 'Debrecen%')
-where w like 'Debrecen%';
+where w.address like 'Debrecen%'
+and m.address not like 'Debrecen%') on m_id = manager_id;
 
 74.Create a view that lists the name of workshop managers ,the name of workshop they 
 manage and the name of workshop they ever worked for if these workshops are different 
 from the workshop they manage.
 
-select m_name,w_name
+create view view1 as
+select b.m_name,b.w_name as_manager,a.w_name as_mechanic from
+(select m_name,w_name,manager_id
 from carmechanic.m_workshop
-left join carmechanic.m_mechanic on m_id = manager_id
-union 
-select m_name,w_name
-from carmechanic.m_workshop
- join carmechanic.m_works_for on w_id = workshop_id
- join carmechanic.m_mechanic on m_id = mechanic_id
-where m_id in (select manager_id from carmechanic.m_workshop)
-order by 1
+join carmechanic.m_mechanic on m_id = manager_id) b left join
+(select m_name,w_name,m_id
+from carmechanic.m_mechanic
+join carmechanic.m_works_for on m_id = mechanic_id
+join carmechanic.m_workshop on w_id = workshop_id
+where m_id in (select manager_id from carmechanic.m_workshop)) a on m_id = manager_id
+and a.w_name != b.w_name ;
+
 
 75.Create a view that shows the name of the workshop where the longest 
 (finished) repair took place,together with the duration of this repair in days.
 
+create view view1 as 
 select w_name,end_date - start_date
 from carmechanic.m_repair
 join carmechanic.m_workshop on w_id = workshop_id
@@ -424,6 +482,7 @@ from carmechanic.m_repair);
 name of their latest owners.If a car has no owner the string 'no owner' should appear 
  next to thier license plate number.
 
+create view view2 as 
 select a2,nvl(o_name,'no name') from
 (select license_plate_number a1,o_name,date_of_buy b1
 from carmechanic.m_car
@@ -442,6 +501,7 @@ on a1 = a2 and b1 = b2;
 82.Create a view that,for each color, list the license plate number and first sell 
 price of the car(s) with that color having the highest first sell price.
 
+create view view2 as 
 select a1,c1,b1 from
 (select color a2 ,max(first_sell_price) b2
 from carmechanic.m_car
@@ -454,6 +514,7 @@ on a1 = a2 and b1=b2;
 83.Create a view that lists the name of car makes and models with most cars in our
 database.
 
+create view view2 as
 select * from 
 (select max(cnt) a1 from
 (select cm_id,cm_name,make,count(*) cnt
@@ -470,6 +531,7 @@ on a1 = a2
 84.Create a view that shows the year(s) for which the most evaluations of cars 
 with this first-sell year took place.
 
+create view view2 as
 select b1,b2 from
 (select max(cnt) a2 from
 (select extract(year from first_sell_date) ,count(*) cnt
@@ -487,6 +549,7 @@ on b2 = a2
 repair in that workshop Both the workshops and the car models should be represented 
 by identifiers in the view .
 
+create view view2 as
 select a1,model_id,b2 from 
 (select workshop_id a1,max(cnt) b1
 from (select workshop_id,model_id,count(*) cnt
