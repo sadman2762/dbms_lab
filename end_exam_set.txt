@@ -301,9 +301,6 @@ drop table m_mechanic cascade constraints;
 with a last name of 'Jakab'(i.e. a name starting with Jakab and a space) and whose color is
 either 'gray' or 'blue'.
 
-52.Insert owners from 'carmechanic' schema into your 'm_owner' table who ever had a toyota 
-car.
-
 insert into m_car
 select * 
 from carmechanic.m_car
@@ -312,6 +309,11 @@ from carmechanic.m_owns
 join carmechanic.m_owner on o_id = owner_id
 where o_name like 'Jakab %')
 and color in ('gray','blue');
+
+52.Insert owners from 'carmechanic' schema into your 'm_owner' table who ever had a toyota 
+car.
+
+
 
 53.Insert car models with no cars from the 'carmechanic' schema into your 'm_car_model'
 table.
