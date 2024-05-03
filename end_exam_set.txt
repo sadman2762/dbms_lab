@@ -158,8 +158,8 @@ fetch first 3 rows with ties;
 
 
 24.List the total repair cost of cars of each model where this total cost is one of the 
-lowest five where this total cost is one of the lowest five.The models should be 
-represented in the result by their identifiers also by their make and model names.
+lowest five.The models should be represented in the result by their identifiers also 
+by their make and model names.
 
 select cm_id,cm_name,make,sum(repair_cost)
 from carmechanic.m_car 
