@@ -4,10 +4,12 @@ model name.
 
 select cm_name,make
 from carmechanic.m_car_model
-join carmechanic.m_car on model_id = cm_id
-join carmechanic.m_car_evaluation on c_id = car_id
+left join carmechanic.m_car on model_id = cm_id
+left join carmechanic.m_car_evaluation on c_id = car_id
 group by cm_id,cm_name,make
+having count(car_id) >=1
 order by make ,cm_name;
+
 
 7.List the license plate number of cars having a repair with a cost greater than all
 repair cost of Toyota cars.Each license plate number should appear only once in the 
