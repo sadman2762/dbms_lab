@@ -548,6 +548,7 @@ select b1 from
 (select extract(year from first_sell_date) ,count(*) cnt
 from carmechanic.m_car
 join carmechanic.m_car_evaluation on c_id = car_id
+where extract(year from first_sell_date) is not null
 group by extract(year from first_sell_date)))
 join
 (select extract(year from first_sell_date) b1,count(*) b2
