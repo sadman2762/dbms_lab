@@ -313,7 +313,7 @@ and color in ('gray','blue');
 52.Insert owners from 'carmechanic' schema into your 'm_owner' table who ever had a toyota 
 car.
 insert into m_owner
-select  distinct o_id,o_name,address
+select  o_id,o_name,address
 from carmechanic.m_owner
 join carmechanic.m_owns on o_id = owner_id
 where car_id in(select c_id 
