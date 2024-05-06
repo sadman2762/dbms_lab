@@ -525,37 +525,25 @@ on a1 = a2 and b1=b2;
 83.Create a view that lists the name of car makes and models with most cars in our
 database.
 
-create view view2 as
-select cm_name,make from 
-(select max(cnt) a1 from
-(select cm_id,cm_name,make,count(*) cnt
-from carmechanic.m_car_model
-join carmechanic.m_car on model_id = cm_id
-group by cm_id,cm_name,make))
-join
-(select cm_name,make,count(*) a2
-from carmechanic.m_car_model
-join carmechanic.m_car on model_id = cm_id
-group by cm_id,cm_name,make)
-on a1 = a2;
+select make,cm_name,count(c_id)
+from carmechanic.m_car
+join carmechanic.m_car_model on model_id = cm_id
+group by cm_id, make ,cm_name
+having count(c_id) is not null
+order by 3 desc
+fetch first 1 row with ties;
 
 84.Create a view that shows the year(s) for which the most evaluations of cars 
 with this first sell year took place.
 
-create view view2 as
-select b1 from
-(select max(cnt) a2 from
-(select extract(year from first_sell_date) ,count(*) cnt
+
+select extract(year from first_sell_date),count(*)
 from carmechanic.m_car
 join carmechanic.m_car_evaluation on c_id = car_id
-where extract(year from first_sell_date) is not null
-group by extract(year from first_sell_date)))
-join
-(select extract(year from first_sell_date) b1,count(*) b2
-from carmechanic.m_car
-join carmechanic.m_car_evaluation on c_id = car_id
-group by extract(year from first_sell_date))
-on b2 = a2;
+group by extract(year from first_sell_date)
+having count(*) is not null
+order by 2 desc
+fetch first 1 row with ties;
 
 85.Create a view for each workshops shows the car model(s) involved in the most 
 repair in that workshop Both the workshops and the car models should be represented 
