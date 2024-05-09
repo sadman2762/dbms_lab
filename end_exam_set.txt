@@ -50,23 +50,23 @@ join carmechanic.m_works_for on m_id = mechanic_id
 where salary < all
 (select  salary
 from carmechanic.m_mechanic
-join carmechanic.m_works_for on m_id = mechanic_id
 join carmechanic.m_workshop on w_id = workshop_id
 where w_name = 'Harmat Kft.')
 group by m_name,m.address,tax_number;
 
 11.List the name of owner who has never owned an Opel car.
 
-select o_name
+select o_name from
+(select o_id,o_name
 from carmechanic.m_owner
 minus
-select o_name 
+select o_id,o_name 
 from carmechanic.m_owns
 join carmechanic.m_owner on o_id = owner_id
 where car_id  in (select c_id
 from carmechanic.m_car_model
 join carmechanic.m_car on model_id = cm_id
-where make = 'Opel')
+where make = 'Opel'));
 
 
 
@@ -89,7 +89,7 @@ from carmechanic.m_car a
 join carmechanic.m_car_model on cm_id = model_id
 where make = 'Opel';
 
-14.List the name and identifier of workshop where no mechanics from Eger have 
+14. List the name and identifier of workshop where no mechanics from Eger have 
 ever worked.The address of mechanic from Eger starts with 'Eger'.
 
 select w_id,w_name
@@ -445,21 +445,31 @@ select cm_name , make
 from carmechanic.m_car_model
 left join carmechanic.m_car on cm_id = model_id
 group by cm_id,make,cm_name
-having count(c_id) = 0;
+having count(c_id) = 0
+
+union
+
+select brand,null
+from carmechanic.m_car_make
+where brand not in(select make from carmechanic.m_car_model);
 
 73.Create a view that lists the name and address of workshops in Debrecen, 
 with the  name and address of the workshop's manager if this manager does not
 live in Debrecen. Addresses in Debrecen start with 'Debrecen'.
 
 create view view1 as 
-select w_name,a,m_name,b from (select w_name,w.address a ,manager_id
-from carmechanic.m_workshop w
-where w.address like 'Debrecen%') left join 
-(select m_name, m.address b,m_id
-from carmechanic.m_workshop w
-join carmechanic.m_mechanic m on m_id = manager_id
-where w.address like 'Debrecen%'
-and m.address not like 'Debrecen%') on m_id = manager_id;
+select w_name,m_name,addr1,addr2 from
+ (select w_name, w.address addr1,w_id,m_name
+ from carmechanic.m_workshop w
+ join carmechanic.m_mechanic m on m_id = manager_id
+ where w.address like 'Debrecen%')
+ 
+ left join
+ 
+(select  m.address addr2,w_id
+ from carmechanic.m_workshop w
+ join carmechanic.m_mechanic m on m_id = manager_id
+ where m.address not like 'Debrecen%') using (w_id);
 
 74.Create a view that lists the name of workshop managers ,the name of workshop they 
 manage and the name of workshop they ever worked for if these workshops are different 
@@ -467,15 +477,15 @@ from the workshop they manage.
 
 create view view1 as
 select b.m_name,b.w_name as_manager,a.w_name as_mechanic from
-(select m_name,w_name,manager_id
+(select m_name,w_name,manager_id,w_id
 from carmechanic.m_workshop
 join carmechanic.m_mechanic on m_id = manager_id) b left join
-(select m_name,w_name,m_id
+(select m_name,w_name,m_id,w_id
 from carmechanic.m_mechanic
 join carmechanic.m_works_for on m_id = mechanic_id
 join carmechanic.m_workshop on w_id = workshop_id
 where m_id in (select manager_id from carmechanic.m_workshop)) a on m_id = manager_id
-and a.w_name != b.w_name ;
+and a.w_id != b.w_id ;
 
 
 75.Create a view that shows the name of the workshop where the longest 
@@ -521,7 +531,7 @@ join
 (select color a1,license_plate_number c1,first_sell_price b1
 from carmechanic.m_car)
 on a1 = a2 and b1=b2
-or a2 is null and b2 = (select max(first_sell_price) b2
+or a2 is null and b1 = (select max(first_sell_price) b2
 from carmechanic.m_car
 where color is null) ;
 
@@ -540,12 +550,12 @@ fetch first 1 row with ties;
 with this first sell year took place.
 
 
-select extract(year from first_sell_date),count(*)
+select extract(year from first_sell_date)
 from carmechanic.m_car
 join carmechanic.m_car_evaluation on c_id = car_id
+where extract(year from first_sell_date) is not null
 group by extract(year from first_sell_date)
-having count(*) is not null
-order by 2 desc
+order by count(*) desc
 fetch first 1 row with ties;
 
 85.Create a view for each workshops shows the car model(s) involved in the most 
@@ -553,7 +563,10 @@ repair in that workshop Both the workshops and the car models should be represen
 by identifiers in the view .
 
 create view view2 as
-select distinct a1,model_id from 
+select w_id,model_id from
+(select w_id from carmechanic.m_workshop) left join
+
+(select distinct a1,model_id from
 (select workshop_id a1,max(cnt) b1
 from (select workshop_id,model_id,count(*) cnt
 from carmechanic.m_car
@@ -565,13 +578,7 @@ join
 from carmechanic.m_car
 join carmechanic.m_repair on c_id = car_id
 group by workshop_id,model_id)
-on a1 = a2 and b1 = b2
-or a1 is null and b1= (select max(cnt) 
-from (select workshop_id,model_id,count(*) cnt
-from carmechanic.m_car
-join carmechanic.m_repair on c_id = car_id
-group by workshop_id,model_id)
-group by workshop_id);
+on a1 = a2 and b1 = b2) on w_id = a1;
 
 91.Grant select privilege to the user named 'dzsoni' on your 'm_mechanic' table.
 
