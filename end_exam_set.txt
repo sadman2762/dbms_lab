@@ -513,14 +513,17 @@ on a1 = a2 and b1 = b2;
 price of the car(s) with that color having the highest first sell price.
 
 create view view2 as 
-select a1,c1,b1 from
+select distinct a2,c1,b2 from
 (select color a2 ,max(first_sell_price) b2
 from carmechanic.m_car
-group by color )
+group by color ) car
 join
 (select color a1,license_plate_number c1,first_sell_price b1
 from carmechanic.m_car)
-on a1 = a2 and b1=b2;
+on a1 = a2 and b1=b2
+or a2 is null and b2 = (select max(first_sell_price) b2
+from carmechanic.m_car
+where color is null) ;
 
 83.Create a view that lists the name of car makes and models with most cars in our
 database.
@@ -550,7 +553,7 @@ repair in that workshop Both the workshops and the car models should be represen
 by identifiers in the view .
 
 create view view2 as
-select a1,model_id from 
+select distinct a1,model_id from 
 (select workshop_id a1,max(cnt) b1
 from (select workshop_id,model_id,count(*) cnt
 from carmechanic.m_car
@@ -562,7 +565,13 @@ join
 from carmechanic.m_car
 join carmechanic.m_repair on c_id = car_id
 group by workshop_id,model_id)
-on a1 = a2 and b1 = b2;
+on a1 = a2 and b1 = b2
+or a1 is null and b1= (select max(cnt) 
+from (select workshop_id,model_id,count(*) cnt
+from carmechanic.m_car
+join carmechanic.m_repair on c_id = car_id
+group by workshop_id,model_id)
+group by workshop_id);
 
 91.Grant select privilege to the user named 'dzsoni' on your 'm_mechanic' table.
 
