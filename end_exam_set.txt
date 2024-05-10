@@ -542,7 +542,6 @@ select make,cm_name,count(c_id)
 from carmechanic.m_car
 join carmechanic.m_car_model on model_id = cm_id
 group by cm_id, make ,cm_name
-having count(c_id) is not null
 order by 3 desc
 fetch first 1 row with ties;
 
