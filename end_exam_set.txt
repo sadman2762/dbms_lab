@@ -1,3 +1,13 @@
+2.List the identifiers of all workshops and the number of repairs of each workshop.Workshop with no 
+repair should also be included . Sort the result descending by the number of repairs.
+
+select w_id, count(car_id)
+from carmechanic.m_workshop
+left join carmechanic.m_repair on w_id = workshop_id
+group by w_id
+order by 2 desc;
+
+
 6.List car models (with brand name and model name ) to which at least one car evaluated 
 belongs.Each model should appear only once in the result.Sort the list by brand then by 
 model name.
@@ -405,6 +415,18 @@ update m_repair
 set repair_cost = repair_cost - (0.1 * (select first_sell_price
 from m_car where c_id = car_id and first_sell_price is not null))
 where car_id in (select c_id from m_car 
+where color in ('red','black'));
+
+--more precise
+update m_repair
+set repair_cost = repair_cost - 0.1 * case when 
+(select first_sell_price 
+from m_car where c_id = car_id ) is not null
+then (select first_sell_price 
+from m_car where c_id = car_id )
+else 0
+end
+where car_id in (select c_id from m_car
 where color in ('red','black'));
 
 63.The workshop named 'Kerekes Alex Szervize' is closing down.(ypu may assume that there is 

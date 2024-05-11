@@ -35,7 +35,7 @@ join carmechanic.m_owner on o_id = owner_id
 where car_id  in (select c_id
 from carmechanic.m_car_model
 join carmechanic.m_car on model_id = cm_id
-where make = 'Opel'));
+where make = 'Suzuki'));
 
 4.Display the mechanics with the two highest salaries who are currently working for
 'Kobela Bt.'  We need to display only the mechanics
