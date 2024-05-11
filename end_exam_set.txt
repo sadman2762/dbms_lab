@@ -78,7 +78,7 @@ from carmechanic.m_car
 where c_id not in (select car_id
 from carmechanic.m_car_evaluation);
 
-13.List all data of cars that were first sold in 2006 or Opel make.
+13.List all data of cars that were first sold in 2006 or Opel make.+
 
 select * 
 from carmechanic.m_car
@@ -90,7 +90,7 @@ join carmechanic.m_car_model on cm_id = model_id
 where make = 'Opel';
 
 14. List the name and identifier of workshop where no mechanics from Eger have 
-ever worked.The address of mechanic from Eger starts with 'Eger'.
+ever worked.The address of mechanic from Eger starts with 'Eger'.+
 
 select w_id,w_name
 from carmechanic.m_workshop
@@ -102,7 +102,7 @@ where address like 'Eger%');
 15.List all data of cars that have been owned someone living in Eger (i.e. someone whose
 address begin with 'Eger') and have been repaired in a workshop in Eger(i.e. in a 
 workshop where address starting with 'Eger').Each car should appear only once in the 
-result.
+result.+
 
 select *
 from carmechanic.m_car
@@ -132,7 +132,7 @@ order by price desc;
 
 22. List the license plate number of cars participating in the evaluations 
 with the 10 lowest evaluation price. Also give the evaluation prices along  with 
-the license plate numbers. Sort the list descending by evaluation price.
+the license plate numbers. Sort the list descending by evaluation price.+
 
 select * from
 (select license_plate_number,price
@@ -185,6 +185,25 @@ and salary is not null
 order by salary desc
 fetch first 2 rows with ties)
 order by salary desc;
+
+--more precise
+
+with rankedmechanics as (
+  select 
+    m_name, 
+    salary, 
+    w_id,
+    dense_rank() over (partition by w_id order by salary desc) as salary_rank
+  from carmechanic.m_mechanic
+  join carmechanic.m_works_for on m_id = mechanic_id
+  join carmechanic.m_workshop on w_id = workshop_id
+  where end_of_employment is null
+  and w_name = 'Kobela Bt.'
+)
+select m_name, salary,w_id
+from rankedmechanics
+where salary_rank <= 2
+order by w_id, salary desc;
 
 31.Create a table named 'relative' where the relatives of mechanics are stored.The table 
 should include the following columns (with arbitrary names):identifier(a string of exactly
@@ -428,7 +447,7 @@ where make in ('Hyundai','Suzuki'));
 
 
 71.Create a view that shows the license plate number of the gray car(s) with 
-the highest first_sell price.
+the highest first_sell price.+
 
 create view view1 as
 select license_plate_number
@@ -438,7 +457,7 @@ and first_sell_price = (select max(first_sell_price)
 from carmechanic.m_car
 where color = 'gray');
 
-72.Create a view that lists the name of car brands and model with no cars.
+72.Create a view that lists the name of car brands and model with no cars.+
 
 create view view1 as
 select cm_name , make
@@ -473,7 +492,7 @@ select w_name,m_name,addr1,addr2 from
 
 74.Create a view that lists the name of workshop managers ,the name of workshop they 
 manage and the name of workshop they ever worked for if these workshops are different 
-from the workshop they manage.
+from the workshop they manage.+
 
 create view view1 as
 select b.m_name,b.w_name as_manager,a.w_name as_mechanic from
@@ -520,7 +539,7 @@ on a1 = a2 and b1 = b2;
 
 
 82.Create a view that,for each color, list the license plate number and first sell 
-price of the car(s) with that color having the highest first sell price.
+price of the car(s) with that color having the highest first sell price.+
 
 create view view2 as 
 select distinct a2,c1,b2 from
@@ -559,7 +578,7 @@ fetch first 1 row with ties;
 
 85.Create a view for each workshops shows the car model(s) involved in the most 
 repair in that workshop Both the workshops and the car models should be represented 
-by identifiers in the view .
+by identifiers in the view .+
 
 create view view2 as
 select w_id,model_id from
