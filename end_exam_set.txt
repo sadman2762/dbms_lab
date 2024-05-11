@@ -477,18 +477,11 @@ with the  name and address of the workshop's manager if this manager does not
 live in Debrecen. Addresses in Debrecen start with 'Debrecen'.
 
 create view view1 as 
-select w_name,m_name,addr1,addr2 from
- (select w_name, w.address addr1,w_id,m_name
- from carmechanic.m_workshop w
- join carmechanic.m_mechanic m on m_id = manager_id
- where w.address like 'Debrecen%')
- 
- left join
- 
-(select  m.address addr2,w_id
- from carmechanic.m_workshop w
- join carmechanic.m_mechanic m on m_id = manager_id
- where m.address not like 'Debrecen%') using (w_id);
+select w_name,w.address,m_name,m.address
+from carmechanic.m_workshop w
+join carmechanic.m_mechanic m on m_id = manager_id
+where w.address like 'Debrecen%'
+and m.address not like 'Debrecen%';
 
 74.Create a view that lists the name of workshop managers ,the name of workshop they 
 manage and the name of workshop they ever worked for if these workshops are different 

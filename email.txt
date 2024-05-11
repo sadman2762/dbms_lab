@@ -1,0 +1,14 @@
+1.if the question asks about color , maximum first sell price and
+license plate number of that car ,if the below solution right?
+
+select distinct color1,lpn1,price1 from
+(select color color1 ,max(first_sell_price) price1
+from carmechanic.m_car
+group by color )
+join
+(select color color2,license_plate_number lpn1,first_sell_price price2
+from carmechanic.m_car)
+on color1 = color2 and price1=price2
+or color1 is null and price2 = (select max(first_sell_price)
+from carmechanic.m_car
+where color is null) ;
