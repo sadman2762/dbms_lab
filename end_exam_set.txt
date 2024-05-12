@@ -54,15 +54,14 @@ where make = 'Suzuki');
 that of all mechanics who ever worked for the workshop name 'Harmat Kft'.Each mechanic
 should appear only once in the result.+
 
-select m_name,m.address,tax_number
+select distinct m_name,m.address,tax_number
 from carmechanic.m_mechanic m
 join carmechanic.m_works_for on m_id = mechanic_id
 where salary < all
 (select  salary
 from carmechanic.m_mechanic
 join carmechanic.m_workshop on w_id = workshop_id
-where w_name = 'Harmat Kft.')
-group by m_name,m.address,tax_number;
+where w_name = 'Harmat Kft.');
 
 11.List the name of owner who has never owned an Opel car.+
 
@@ -162,7 +161,6 @@ select model_id,avg(price)
 from  carmechanic.m_car 
 join carmechanic.m_car_evaluation on car_id = c_id
 group by model_id
-having avg(price) is not null
 order by avg(price)
 fetch first 3 rows with ties;
 
@@ -305,9 +303,9 @@ alter table m_mechanic drop column phone;
 43. Delete the table 'm_owner' and m_owns'. Take into account the foreign keys referencing
 these tables. You may use multiple statements to solve this take.
 
-drop table m_owner cascade constraints purge;
+drop table m_owner cascade constraints ;
 
-drop table m_owns cascade constraints purge;
+drop table m_owns cascade constraints ;
 
 44.Delete primary key constraint from 'm_owns' table.
 
