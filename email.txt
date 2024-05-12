@@ -39,7 +39,7 @@ where make = 'Suzuki'));
 
 4.Display the mechanics with the two highest salaries who are currently working for
 'Kobela Bt.'  We need to display only the mechanics
-name and salary ,sorted descending by salary.
+name and salary ,sorted descending by salary.(if more than one workshop with that name)
 
 with rankedmechanics as (
   select 
@@ -57,3 +57,13 @@ select m_name, salary,w_id
 from rankedmechanics
 where salary_rank <= 2
 order by w_id, salary desc;
+
+new questions
+1.List the identifiers of all workshops and the number of repairs of each workshop.Workshop with no 
+repair should also be included . Sort the result descending by the number of repairs.
+
+select w_id, count(car_id)
+from carmechanic.m_workshop
+left join carmechanic.m_repair on w_id = workshop_id
+group by w_id
+order by 2 desc;
