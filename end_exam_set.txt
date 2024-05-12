@@ -10,7 +10,7 @@ order by 2 desc;
 
 6.List car models (with brand name and model name ) to which at least one car evaluated 
 belongs.Each model should appear only once in the result.Sort the list by brand then by 
-model name.
+model name.+
 
 select cm_name,make
 from carmechanic.m_car_model
@@ -23,7 +23,7 @@ order by make ,cm_name;
 
 7.List the license plate number of cars having a repair with a cost greater than all
 repair cost of Toyota cars.Each license plate number should appear only once in the 
-result.
+result.+
 
 select distinct license_plate_number
 from carmechanic.m_car
@@ -36,7 +36,7 @@ join carmechanic.m_car_model on cm_id = model_id
 where make = 'Toyota');
 
 8.List the license plate number of cars having a repair cost less than any repair cost 
-of a Suzuki car.Each license plate number should appear only once in the result.
+of a Suzuki car.Each license plate number should appear only once in the result.+
 
 select distinct license_plate_number
 from carmechanic.m_car
@@ -52,7 +52,7 @@ where make = 'Suzuki');
 
 10.List the name , address and tax number of mechanics who ever had a salary less than
 that of all mechanics who ever worked for the workshop name 'Harmat Kft'.Each mechanic
-should appear only once in the result.*
+should appear only once in the result.+
 
 select m_name,m.address,tax_number
 from carmechanic.m_mechanic m
@@ -64,7 +64,7 @@ join carmechanic.m_workshop on w_id = workshop_id
 where w_name = 'Harmat Kft.')
 group by m_name,m.address,tax_number;
 
-11.List the name of owner who has never owned an Opel car.
+11.List the name of owner who has never owned an Opel car.+
 
 select o_name from
 (select o_id,o_name
@@ -129,7 +129,7 @@ where address like 'Eger%');
 
 21.List the license plate number of cars participating in the evaluations with the 
 5 highest evaluation prices.Also give the evaluation price along with license plate 
-numbers.Sort the list descending by the evaluation price.
+numbers.Sort the list descending by the evaluation price.+
 
 select * from
 (select license_plate_number, price
@@ -156,7 +156,7 @@ order by price desc;
 
 23.List the average evaluation price of cars of each model where this average is 
 one of the lowest three. The models should be represented in the result by 
-their identifiers.
+their identifiers.+
 
 select model_id,avg(price)
 from  carmechanic.m_car 
@@ -169,20 +169,19 @@ fetch first 3 rows with ties;
 
 24.List the total repair cost of cars of each model where this total cost is one of the 
 lowest five.The models should be represented in the result by their identifiers also 
-by their make and model names.
+by their make and model names.+
 
 select cm_id,cm_name,make,sum(repair_cost)
 from carmechanic.m_car 
 join carmechanic.m_car_model on cm_id = model_id
 join carmechanic.m_repair on c_id = car_id
 group by cm_id,make,cm_name
-having sum(repair_cost) is not null
 order by sum(repair_cost)
 fetch first 5 row with ties;
 
 25.List the mechanics with the two highest salaries who are currently working for 
 'Kobela Bt.' (i.e for whom the end of employment is not given). List only the mechanics 
-name and salary ,sorted descending by salary.
+name and salary ,sorted descending by salary.(if there is only one 'Kobela Bt.' workshop)
 
 select * from
 (select m_name,salary
@@ -196,7 +195,7 @@ order by salary desc
 fetch first 2 rows with ties)
 order by salary desc;
 
---more precise
+--more precise(if more than one)
 
 with rankedmechanics as (
   select 
@@ -328,7 +327,7 @@ drop table m_mechanic cascade constraints;
 
 51.Insert cars from the 'carmechanic' schema into your 'm_car' table that ever had an owner
 with a last name of 'Jakab'(i.e. a name starting with Jakab and a space) and whose color is
-either 'gray' or 'blue'.
+either 'gray' or 'blue'.+
 
 insert into m_car
 select * 
@@ -340,7 +339,7 @@ where o_name like 'Jakab %')
 and color in ('gray','blue');
 
 52.Insert owners from 'carmechanic' schema into your 'm_owner' table who ever had a toyota 
-car.
+car.+
 insert into m_owner
 select  o_id,o_name,address
 from carmechanic.m_owner
@@ -352,7 +351,7 @@ where make = 'Toyota');
 
 
 53.Insert car models with no cars from the 'carmechanic' schema into your 'm_car_model'
-table.
+table.+
 
 insert into m_car_model
 select b.*
@@ -361,13 +360,13 @@ left join carmechanic.m_car on cm_id = model_id
 where c_id is null;
 
 54.Insert car models with the string 'airbag' in their details from the carmechanic schema 
-into your 'm_car_model' table.
+into your 'm_car_model' table.+
 insert into m_car_model
 select *
 from carmechanic.m_car_model
 where details like '%airbag%';
 
-56.Delete repairs of black cars that were finished in 2018
+56.Delete repairs of black cars that were finished in 2018.+
 
 delete from m_repair 
 where extract(year from end_date)=2018 and 
@@ -377,14 +376,14 @@ car_id in (select c_id from carmechanic.m_car
 57.The workshop named 'Kerekes Alex Szervize' is closing down (you may assume that there 
 is only one workshop with that name). Delete the employment of all mechanics currently 
 working there.More specifically: delete rows from the 'm_works_for' table that represent
- an employment at this workshop with an unspecified end of employment.
+ an employment at this workshop with an unspecified end of employment.+
 
  delete from m_works_for 
  where end_of_employment is null 
  and workshop_id = (select w_id from carmechanic.m_workshop
   where w_name = 'Kerekes Alex Szervize');
 
-58.Delete car brands with no models in our database.
+58.Delete car brands with no models in our database.+
 
 DELETE FROM m_car_make
 WHERE brand in (
@@ -411,12 +410,6 @@ and end_date <= date'2019-03-31');
 62. Decrease the repair cost of the red and the black cars by 10% of the car's first-sell
  price.If the first-sell price is unknown, then the repair cost should be unchanged.
 
-update m_repair
-set repair_cost = repair_cost - (0.1 * (select first_sell_price
-from m_car where c_id = car_id and first_sell_price is not null))
-where car_id in (select c_id from m_car 
-where color in ('red','black'));
-
 --more precise
 update m_repair
 set repair_cost = repair_cost - 0.1 * case when 
@@ -432,7 +425,7 @@ where color in ('red','black'));
 63.The workshop named 'Kerekes Alex Szervize' is closing down.(ypu may assume that there is 
 only one workshop with this name) due to this all started repairs must be finished.Set the 
 end date of each unfinished repair to current date and set the repair cost to number of 
-days since the start of the repair multiplied by 10% of the first sell price.
+days since the start of the repair multiplied by 10% of the first sell price.+
 
 update m_repair
  set end_date =  sysdate ,
@@ -445,7 +438,7 @@ update m_repair
 
 64.The youngest mechanic moves in to the oldest. Update the address of the youngest
  mechanic accordingly.(you may assume that there is only one youngest and one oldest 
- mechanic).
+ mechanic).+
 
  update m_mechanic 
 set address = (select address from carmechanic.m_mechanic
@@ -457,16 +450,22 @@ where birth_date = (select max(birth_date) from carmechanic.m_mechanic);
 
 
  65.Increase the price of car evaluations that took place after 2011 and involved a
-  Hyundai or Suzuki car by 20% of the car's first-sell price.
+  Hyundai or Suzuki car by 20% of the car's first-sell price.+
+
+
 
 update m_car_evaluation 
-set price = price + (0.2 * (select first_sell_price from carmechanic.m_car
-where c_id = car_id)) 
+set price = price + (0.2 * case when
+(select first_sell_price from carmechanic.m_car
+where c_id = car_id) is not null
+then (select first_sell_price from carmechanic.m_car
+where c_id = car_id)
+else 0
+end)
 where extract(year from  evaluation_date) > 2011
 and car_id in (select c_id from m_car
 join m_car_model on model_id = cm_id
 where make in ('Hyundai','Suzuki'));
-
 
 71.Create a view that shows the license plate number of the gray car(s) with 
 the highest first_sell price.+
@@ -523,7 +522,7 @@ and a.w_id != b.w_id ;
 
 
 75.Create a view that shows the name of the workshop where the longest 
-(finished) repair took place,together with the duration of this repair in days.
+(finished) repair took place,together with the duration of this repair in days.+
 
 create view view1 as 
 select w_name,end_date - start_date
@@ -538,7 +537,7 @@ name of their latest owners.If a car has no owner the string 'no owner' should a
  next to thier license plate number.
 
 create view view2 as 
-select a2,nvl(o_name,'no name') from
+select a2,nvl(o_name,'no owner') from
 (select license_plate_number a1,o_name,date_of_buy b1
 from carmechanic.m_car
 left join carmechanic.m_owns on c_id = car_id
