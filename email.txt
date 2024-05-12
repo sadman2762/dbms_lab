@@ -58,6 +58,25 @@ from rankedmechanics
 where salary_rank <= 2
 order by w_id, salary desc;
 
+5.Create a view that lists the license plate number of all cars together with the 
+name of their latest owners.If a car has no owner the string 'no owner' should appear 
+ next to thier license plate number.
+
+create view view2 as 
+select a2,nvl(o_name,'no owner') from
+(select license_plate_number a1,o_name,date_of_buy b1
+from carmechanic.m_car
+left join carmechanic.m_owns on c_id = car_id
+left join carmechanic.m_owner on o_id = owner_id
+order by 1)
+ right join 
+(select license_plate_number a2,max(date_of_buy) b2
+from carmechanic.m_car
+left join carmechanic.m_owns on c_id = car_id
+left join carmechanic.m_owner on o_id = owner_id
+group by license_plate_number)
+on a1 = a2 and b1 = b2;
+
 new questions
 1.List the identifiers of all workshops and the number of repairs of each workshop.Workshop with no 
 repair should also be included . Sort the result descending by the number of repairs.
@@ -67,3 +86,75 @@ from carmechanic.m_workshop
 left join carmechanic.m_repair on w_id = workshop_id
 group by w_id
 order by 2 desc;
+
+2.List all data of cars that have never been evaluated?
+
+select *
+from carmechanic.m_car
+where c_id not in (select car_id
+from carmechanic.m_car_evaluation);
+
+3.Increase by 10% the cost of repairs that were finished between January 1,2018 and March
+ 31, 2019 in the workshop named 'Kobela Bt.'(you may assume that there is only one workshop
+ with that name).
+
+UPDATE m_repair
+SET repair_cost = repair_cost * 1.1  
+WHERE car_id in(select car_id
+from carmechanic.m_repair
+join carmechanic.m_workshop on w_id = workshop_id
+where w_name = 'Kobela Bt.'
+and end_date >= date'2018-01-01'
+and end_date <= date'2019-03-31');
+
+4. Decrease the repair cost of the red and the black cars by 10% of the car's first-sell
+ price.If the first-sell price is unknown, then the repair cost should be unchanged.
+
+update m_repair
+set repair_cost = repair_cost - 0.1 * case when 
+(select first_sell_price 
+from m_car where c_id = car_id ) is not null
+then (select first_sell_price 
+from m_car where c_id = car_id )
+else 0
+end
+where car_id in (select c_id from m_car
+where color in ('red','black'));
+
+2nd solution:
+
+
+5.The youngest mechanic moves in to the oldest. Update the address of the youngest
+ mechanic accordingly.(you may assume that there is only one youngest and one oldest 
+ mechanic).
+
+ update m_mechanic 
+set address = (select address from carmechanic.m_mechanic
+where birth_date is not null
+order by birth_date 
+fetch first row only)
+where birth_date = (select max(birth_date) from carmechanic.m_mechanic);
+
+6. lists the name of car makes and models with most cars in our
+database.
+
+select make,cm_name,count(c_id)
+from carmechanic.m_car
+join carmechanic.m_car_model on model_id = cm_id
+group by cm_id, make ,cm_name
+order by 3 desc
+fetch first 1 row with ties;
+
+7.Create a view that shows the year(s) for which the most evaluations of cars 
+with this first sell year took place.
+
+
+select extract(year from first_sell_date)
+from carmechanic.m_car
+join carmechanic.m_car_evaluation on c_id = car_id
+where extract(year from first_sell_date) is not null
+group by extract(year from first_sell_date)
+order by count(*) desc
+fetch first 1 row with ties;
+
+
