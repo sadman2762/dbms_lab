@@ -394,18 +394,20 @@ WHERE brand in (
  31, 2019 in the workshop named 'Kobela Bt.'(you may assume that there is only one workshop
  with that name).
 
-UPDATE m_repair
-SET repair_cost = repair_cost + (0.1 * repair_cost)
-WHERE (end_date >= date'2018-01-01' and end_date <= date'2019-03-31')
-and workshop_id = (SELECT w_id FROM carmechanic.m_workshop WHERE w_name = 'Kobela Bt.');
-
+update m_repair
+set repair_cost = 1.1 * repair_cost
+where end_date >= date'2018-01-01'
+and end_date < date'2019-04-01'
+and workshop_id in (select w_id 
+from m_workshop
+where w_name ='Kobela Bt.');
 
 
 
 62. Decrease the repair cost of the red and the black cars by 10% of the car's first-sell
  price.If the first-sell price is unknown, then the repair cost should be unchanged.
 
---more precise
+
 update m_repair
 set repair_cost = repair_cost - 0.1 * case when 
 (select first_sell_price 
@@ -417,17 +419,20 @@ end
 where car_id in (select c_id from m_car
 where color in ('red','black'));
 
+--more precise
+
+
 63.The workshop named 'Kerekes Alex Szervize' is closing down.(ypu may assume that there is 
 only one workshop with this name) due to this all started repairs must be finished.Set the 
 end date of each unfinished repair to current date and set the repair cost to number of 
 days since the start of the repair multiplied by 10% of the first sell price.+
 
 update m_repair
- set end_date =  sysdate ,
-  repair_cost =  .1 * (select first_sell_price
- from m_car where c_id = car_id) * (sysdate - start_date)
- where end_date is null and repair_cost is null  and workshop_id in(select w_id 
- from m_workshop where w_name = 'Kerekes Alex Szervize');
+set end_date =  sysdate ,
+repair_cost =  .1 * (select first_sell_price
+from m_car where c_id = car_id) * (sysdate - start_date)
+where end_date is null   and workshop_id in(select w_id 
+from m_workshop where w_name = 'Kerekes Alex Szervize');
 
 
 
@@ -435,7 +440,7 @@ update m_repair
  mechanic accordingly.(you may assume that there is only one youngest and one oldest 
  mechanic).+
 
- update m_mechanic 
+update m_mechanic 
 set address = (select address from carmechanic.m_mechanic
 where birth_date is not null
 order by birth_date 
@@ -488,7 +493,7 @@ where brand not in(select make from carmechanic.m_car_model);
 
 73.Create a view that lists the name and address of workshops in Debrecen, 
 with the  name and address of the workshop's manager if this manager does not
-live in Debrecen. Addresses in Debrecen start with 'Debrecen'.
+live in Debrecen. Addresses in Debrecen start with 'Debrecen'.+
 
 create view view1 as 
 select w_name,w.address,m_name,m.address
@@ -527,7 +532,7 @@ from carmechanic.m_repair);
 
 81.Create a view that lists the license plate number of all cars together with the 
 name of their latest owners.If a car has no owner the string 'no owner' should appear 
- next to thier license plate number.
+ next to thier license plate number.+
 
 create view view2 as 
 select a2,nvl(o_name,'no owner') from
@@ -562,7 +567,7 @@ from carmechanic.m_car
 where color is null) ;
 
 83.Create a view that lists the name of car makes and models with most cars in our
-database.
+database.+
 
 select make,cm_name
 from carmechanic.m_car
@@ -572,7 +577,7 @@ order by count(c_id) desc
 fetch first 1 row with ties;
 
 84.Create a view that shows the year(s) for which the most evaluations of cars 
-with this first sell year took place.
+with this first sell year took place.+
 
 
 select extract(year from first_sell_date)
