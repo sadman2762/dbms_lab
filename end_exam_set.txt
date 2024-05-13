@@ -395,13 +395,10 @@ WHERE brand in (
  with that name).
 
 UPDATE m_repair
-SET repair_cost = repair_cost * 1.1  
-WHERE car_id in(select car_id
-from carmechanic.m_repair
-join carmechanic.m_workshop on w_id = workshop_id
-where w_name = 'Kobela Bt.'
-and end_date >= date'2018-01-01'
-and end_date <= date'2019-03-31');
+SET repair_cost = repair_cost + (0.1 * repair_cost)
+WHERE (end_date >= date'2018-01-01' and end_date <= date'2019-03-31')
+and workshop_id = (SELECT w_id FROM carmechanic.m_workshop WHERE w_name = 'Kobela Bt.');
+
 
 
 
@@ -450,8 +447,6 @@ where birth_date = (select max(birth_date) from carmechanic.m_mechanic);
  65.Increase the price of car evaluations that took place after 2011 and involved a
   Hyundai or Suzuki car by 20% of the car's first-sell price.+
 
-
-
 update m_car_evaluation 
 set price = price + (0.2 * case when
 (select first_sell_price from carmechanic.m_car
@@ -487,7 +482,7 @@ having count(c_id) = 0
 
 union
 
-select brand,null
+select null,brand
 from carmechanic.m_car_make
 where brand not in(select make from carmechanic.m_car_model);
 
@@ -569,11 +564,11 @@ where color is null) ;
 83.Create a view that lists the name of car makes and models with most cars in our
 database.
 
-select make,cm_name,count(c_id)
+select make,cm_name
 from carmechanic.m_car
 join carmechanic.m_car_model on model_id = cm_id
 group by cm_id, make ,cm_name
-order by 3 desc
+order by count(c_id) desc
 fetch first 1 row with ties;
 
 84.Create a view that shows the year(s) for which the most evaluations of cars 
@@ -616,7 +611,7 @@ GRANT SELECT ON m_mechanic TO dzsoni;
 
 92.Grant INSERT and UPDATE privileges to the user names 'dszoni' on your 'm_owner' table.
 
-GRANT INSERT, UPDATE ON m_owner TO dszoni;
+GRANT INSERT, UPDATE ON m_owner TO dzsoni;
 
 
 
