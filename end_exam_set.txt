@@ -494,7 +494,7 @@ name of their latest owners.If a car has no owner the string 'no owner' should a
  next to thier license plate number.
 
 create view view2 as 
-select a2,nvl(o_name,'no name') from
+select a2,nvl(o_name,'no owner') from
 (select license_plate_number a1,o_name,date_of_buy b1
 from carmechanic.m_car
 left join carmechanic.m_owns on c_id = car_id
@@ -521,7 +521,7 @@ join
 (select color a1,license_plate_number c1,first_sell_price b1
 from carmechanic.m_car)
 on a1 = a2 and b1=b2
-or a2 is null and b2 = (select max(first_sell_price) b2
+or a2 is null and b1 = (select max(first_sell_price) b2
 from carmechanic.m_car
 where color is null) ;
 
