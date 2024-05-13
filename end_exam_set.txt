@@ -1,5 +1,5 @@
 2.List the identifiers of all workshops and the number of repairs of each workshop.Workshop with no 
-repair should also be included . Sort the result descending by the number of repairs.
+repair should also be included . Sort the result descending by the number of repairs.+
 
 select w_id, count(car_id)
 from carmechanic.m_workshop
@@ -179,7 +179,7 @@ fetch first 5 row with ties;
 
 25.List the mechanics with the two highest salaries who are currently working for 
 'Kobela Bt.' (i.e for whom the end of employment is not given). List only the mechanics 
-name and salary ,sorted descending by salary.(if there is only one 'Kobela Bt.' workshop)
+name and salary ,sorted descending by salary.(if there is only one 'Kobela Bt.' workshop)+
 
 select * from
 (select m_name,salary
@@ -392,7 +392,7 @@ WHERE brand in (
 
 61.Increase by 10% the cost of repairs that were finished between January 1,2018 and March
  31, 2019 in the workshop named 'Kobela Bt.'(you may assume that there is only one workshop
- with that name).
+ with that name).+
 
 update m_repair
 set repair_cost = 1.1 * repair_cost
