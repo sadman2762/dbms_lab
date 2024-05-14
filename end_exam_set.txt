@@ -522,7 +522,7 @@ and a.w_id != b.w_id ;
 (finished) repair took place,together with the duration of this repair in days.+
 
 create view view1 as 
-select w_name,end_date - start_date
+select w_name,end_date - start_date as a1
 from carmechanic.m_repair
 join carmechanic.m_workshop on w_id = workshop_id
 where end_date - start_date = (select max(end_date - start_date)
