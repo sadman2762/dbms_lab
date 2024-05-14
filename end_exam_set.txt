@@ -79,7 +79,6 @@ where make = 'Opel'));
 
 
 
-
 12.List all data of cars that have never been evaluated?
 
 select *
