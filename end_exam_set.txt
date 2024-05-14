@@ -59,7 +59,7 @@ from carmechanic.m_mechanic m
 join carmechanic.m_works_for on m_id = mechanic_id
 where salary < all
 (select  salary
-from carmechanic.m_mechanic
+from carmechanic.m_works_for
 join carmechanic.m_workshop on w_id = workshop_id
 where w_name = 'Harmat Kft.');
 
@@ -339,11 +339,11 @@ and color in ('gray','blue');
 52.Insert owners from 'carmechanic' schema into your 'm_owner' table who ever had a toyota 
 car.+
 insert into m_owner
-select  o_id,o_name,address
+select * 
 from carmechanic.m_owner
-join carmechanic.m_owns on o_id = owner_id
-where car_id in(select c_id 
-from carmechanic.m_car 
+where o_id in (select owner_id
+from carmechanic.m_owns
+join carmechanic.m_car on c_id = car_id
 join carmechanic.m_car_model on model_id = cm_id
 where make = 'Toyota');
 
