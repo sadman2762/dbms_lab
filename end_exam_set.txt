@@ -494,12 +494,19 @@ where brand not in(select make from carmechanic.m_car_model);
 with the  name and address of the workshop's manager if this manager does not
 live in Debrecen. Addresses in Debrecen start with 'Debrecen'.+
 
-create view view1 as 
-select w_name,w.address,m_name,m.address
-from carmechanic.m_workshop w
-join carmechanic.m_mechanic m on m_id = manager_id
-where w.address like 'Debrecen%'
-and m.address not like 'Debrecen%';
+CREATE VIEW view100 AS
+SELECT
+    w.w_name AS workshop_name,
+    w.address AS workshop_address,
+    m.m_name AS mechanic_name,
+    m.address AS mechanic_address
+FROM
+    carmechanic.m_workshop w
+JOIN
+    carmechanic.m_mechanic m ON w.manager_id = m.m_id
+WHERE
+    w.address LIKE 'Debrecen%'
+    AND m.address NOT LIKE 'Debrecen%';
 
 74.Create a view that lists the name of workshop managers ,the name of workshop they 
 manage and the name of workshop they ever worked for if these workshops are different 
