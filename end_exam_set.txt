@@ -10,7 +10,7 @@ order by 2 desc;
 5.list all cars with their license plate numbers, as well as the cost of all repairs of each car.
 If a car has never been repaired, the string 'no repair' should appear in place of repair cost.
 
-elect license_plate_number,
+select license_plate_number,
 nvl(to_char(sum(repair_cost)),'no repair')
 from carmechanic.m_car left join 
 carmechanic.m_repair
