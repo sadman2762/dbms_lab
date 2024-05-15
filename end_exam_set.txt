@@ -7,6 +7,16 @@ left join carmechanic.m_repair on w_id = workshop_id
 group by w_id
 order by 2 desc;
 
+5.list all cars with their license plate numbers, as well as the cost of all repairs of each car.
+If a car has never been repaired, the string 'no repair' should appear in place of repair cost.
+
+elect license_plate_number,
+nvl(to_char(sum(repair_cost)),'no repair')
+from carmechanic.m_car left join 
+carmechanic.m_repair
+on car_id = c_id
+group by license_plate_number;
+
 
 6.List car models (with brand name and model name ) to which at least one car evaluated 
 belongs.Each model should appear only once in the result.Sort the list by brand then by 
@@ -388,6 +398,20 @@ WHERE brand in (
   minus
   select make from carmechanic.m_car_model
 );
+
+59.The car with a license plate number 'ABC201' has been declared out of order.Delete all past 
+and present ownership of this vehicle.
+
+delete from m_owns
+Where car_id in ( select c_id
+From m_car where license_plate_number= 'ABC201');
+
+60.Delete the evaluation data of cars with a license plate number not consisting of exactly 6
+chracters.
+
+delete from m_car_evaluation
+where car_id in (select c_id
+from m_car where length(license_plate_number) != 6);
 
 61.Increase by 10% the cost of repairs that were finished between January 1,2018 and March
  31, 2019 in the workshop named 'Kobela Bt.'(you may assume that there is only one workshop
